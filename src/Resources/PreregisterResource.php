@@ -2,6 +2,7 @@
 
 namespace SmartDato\CorreosShipping\Resources;
 
+use Saloon\Http\Response;
 use SmartDato\CorreosShipping\Connectors\PreregisterConnector;
 use SmartDato\CorreosShipping\Data\Preregister\AnnulmentExpeditionRequestData;
 use SmartDato\CorreosShipping\Data\Preregister\AnnulmentRequestData;
@@ -38,13 +39,13 @@ use SmartDato\CorreosShipping\Requests\Preregister\ValidateShipmentsRequest;
 
 class PreregisterResource
 {
-    protected ?\Saloon\Http\Response $lastResponse = null;
+    protected ?Response $lastResponse = null;
 
     public function __construct(
         protected PreregisterConnector $connector,
     ) {}
 
-    public function lastResponse(): ?\Saloon\Http\Response
+    public function lastResponse(): ?Response
     {
         return $this->lastResponse;
     }

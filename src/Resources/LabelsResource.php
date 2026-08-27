@@ -2,6 +2,7 @@
 
 namespace SmartDato\CorreosShipping\Resources;
 
+use Saloon\Http\Response;
 use SmartDato\CorreosShipping\Connectors\LabelsConnector;
 use SmartDato\CorreosShipping\Data\Labels\DocumentBackofficeResponseData;
 use SmartDato\CorreosShipping\Data\Labels\DocumentResponseData;
@@ -14,13 +15,13 @@ use SmartDato\CorreosShipping\Requests\Labels\PrintLabelsRequest;
 
 class LabelsResource
 {
-    protected ?\Saloon\Http\Response $lastResponse = null;
+    protected ?Response $lastResponse = null;
 
     public function __construct(
         protected LabelsConnector $connector,
     ) {}
 
-    public function lastResponse(): ?\Saloon\Http\Response
+    public function lastResponse(): ?Response
     {
         return $this->lastResponse;
     }

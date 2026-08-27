@@ -2,6 +2,7 @@
 
 namespace SmartDato\CorreosShipping\Resources;
 
+use Saloon\Http\Response;
 use SmartDato\CorreosShipping\Connectors\TrackingConnector;
 use SmartDato\CorreosShipping\Data\Tracking\ExpeditionResponseData;
 use SmartDato\CorreosShipping\Data\Tracking\ShipmentSearchResponseData;
@@ -10,13 +11,13 @@ use SmartDato\CorreosShipping\Requests\Tracking\SearchShipmentRequest;
 
 class TrackingResource
 {
-    protected ?\Saloon\Http\Response $lastResponse = null;
+    protected ?Response $lastResponse = null;
 
     public function __construct(
         protected TrackingConnector $connector,
     ) {}
 
-    public function lastResponse(): ?\Saloon\Http\Response
+    public function lastResponse(): ?Response
     {
         return $this->lastResponse;
     }
