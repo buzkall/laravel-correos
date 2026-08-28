@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace SmartDato\CorreosShipping\Connectors;
 
 use Saloon\Contracts\Authenticator;

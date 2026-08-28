@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace SmartDato\CorreosShipping\Requests\Preregister;
 
 use Saloon\Contracts\Body\HasBody;

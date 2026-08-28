@@ -1,9 +1,8 @@
 <?php
 
-declare(strict_types=1);
-
 use Pest\Rector\Set\PestSetList;
 use Rector\Config\RectorConfig;
+use Rector\TypeDeclaration\Rector\StmtsAwareInterface\SafeDeclareStrictTypesRector;
 use RectorLaravel\Set\LaravelSetList;
 
 return RectorConfig::configure()
@@ -15,6 +14,10 @@ return RectorConfig::configure()
     ->withRootFiles()
     ->withSkip([
         __DIR__.'/tests/Fixtures',
+
+        // The package does not use strict types; adding them is a behavioural
+        // change that is out of scope for the tooling set-up.
+        SafeDeclareStrictTypesRector::class,
     ])
     ->withImportNames(removeUnusedImports: true)
     ->withPhpSets(php84: true)

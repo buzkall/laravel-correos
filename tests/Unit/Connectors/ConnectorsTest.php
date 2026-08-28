@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 use SmartDato\CorreosShipping\Auth\CorreosAuthenticator;
 use SmartDato\CorreosShipping\Connectors\LabelsConnector;
 use SmartDato\CorreosShipping\Connectors\PreregisterConnector;

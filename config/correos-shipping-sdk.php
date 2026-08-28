@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 return [
     'oauth' => [
         'client_id' => env('CORREOS_OAUTH_CLIENT_ID'),
