@@ -5,12 +5,14 @@
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/smart-dato/correos-shipping-sdk/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/smart-dato/correos-shipping-sdk/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/smart-dato/correos-shipping-sdk.svg?style=flat-square)](https://packagist.org/packages/smart-dato/correos-shipping-sdk)
 
-Laravel package for integrating with the Correos (Spanish postal service) APIs. Supports shipment preregistration, label and customs document generation, and tracking. Built on [Saloon 3.x](https://docs.saloon.dev) for HTTP and [Spatie Laravel Data 4.x](https://spatie.be/docs/laravel-data) for DTOs.
+Laravel package for integrating with the Correos (Spanish postal service) APIs. Supports shipment preregistration, label and customs document generation, and tracking. Built on [Saloon 4.x](https://docs.saloon.dev) for HTTP and [Spatie Laravel Data 4.x](https://spatie.be/docs/laravel-data) for DTOs.
 
 ## Requirements
 
 - PHP 8.4+
-- Laravel 11 or 12
+- Laravel 11, 12 or 13
+
+Collections (*recogidas*) are not covered: the API has no resource for them yet, so shipments are handed over at an office or picked up under a standing agreement.
 
 ## Installation
 
@@ -87,6 +89,16 @@ If the pre-production environment only allows IPv4 connections (e.g., CloudFront
 CORREOS_FORCE_IP_RESOLVE=v4
 ```
 
+### Network access
+
+Correos whitelists the client IP for the pre-production environment: connections from a
+non-whitelisted address (and any IPv6 address, which CloudFront answers with a `403`) are
+rejected before they reach the API, and PRE is only up Monday to Friday, 08:00–20:00 CET.
+Confirm with your Correos commercial contact whether your production contract carries the
+same restriction; if it does, every host that calls the API — web servers, queue workers,
+scheduled jobs — has to egress from a fixed, whitelisted IPv4 address, which usually means
+pinning them to a static IP or routing them through a NAT gateway.
+
 ## Usage
 
 Resolve the SDK from the container (or use the `CorreosShipping` facade):
@@ -161,7 +173,39 @@ $labelRequest = PrintLabelsRequestData::from([
 
 $labels = $correos->labels()->printLabels($labelRequest);
 
-$labels->pdf;  // Base64-encoded PDF content
+$labels->pdf;            // Base64-encoded PDF content
+$labels->decodedPdf();   // The same PDF as raw bytes, or null if there is none
+```
+
+`labelPrintMode` decides what that PDF contains, and the two modes are not interchangeable:
+
+- `1` (A4) returns a full A4 page with the labels already laid out on the sheet.
+- `2` (labeler) returns one label per page, at label size.
+
+To place labels yourself on an A4 sheet — starting at an arbitrary cell, or mixing carriers on
+one sheet — ask for mode `2` and compose the page with FPDI; mode `1` gives you a page you
+would have to cut up again:
+
+```php
+use setasign\Fpdi\Fpdi;
+use setasign\Fpdi\PdfParser\StreamReader;
+
+$pdf = new Fpdi;
+$pdf->AddPage();
+
+$pages = $pdf->setSourceFile(
+    StreamReader::createByString($labels->decodedPdf())
+);
+
+// 2 columns x 4 rows of 105mm x 74.25mm cells on A4.
+foreach (range(1, $pages) as $cell => $page) {
+    $pdf->useTemplate(
+        $pdf->importPage($page),
+        x: ($cell % 2) * 105,
+        y: intdiv($cell, 2) * 74.25,
+        width: 105,
+    );
+}
 ```
 
 ### Print Customs Documents (DCAF/DDP)
@@ -284,6 +328,14 @@ use SmartDato\CorreosShipping\Enums\AdmissionMethod;     // Office, Citypaq, Del
 use SmartDato\CorreosShipping\Enums\ErrorCodeLanguage;   // Spanish, English
 ```
 
+Each case carries a human readable `label()`, and every enum exposes `options()` — value =>
+label pairs, ready for a select input:
+
+```php
+ProductCode::PaqPremium->label();  // "Paq Premium"
+LabelPrintMode::options();         // [1 => 'A4 sheet', 2 => 'Labeler']
+```
+
 ## Error Handling
 
 API errors are thrown as `CorreosApiException`:
@@ -299,6 +351,66 @@ try {
     $e->errorCode;            // Correos error code
     $e->moreInformation;     // Additional error details
 }
+```
+
+## Using it from Filament (or any Livewire component)
+
+Nothing special is needed to call the SDK from a Filament page or action — but four things
+are worth knowing.
+
+**Strip nulls before hydrating a DTO.** Optional fields are typed `string|Optional`, and a
+Filament form submits `null` for the ones the user left alone, which is a `TypeError` rather
+than a validation error:
+
+```php
+$clean = fn (array $values) => collect($values)
+    ->map(fn ($value) => is_array($value) ? $clean($value) : $value)
+    ->reject(fn ($value) => $value === null || $value === '' || $value === [])
+    ->all();
+
+$request = DeliveryRequestData::from($clean($this->form->getState()));
+```
+
+**Keep writes off the request cycle.** `createShipments()` is not idempotent, so a call that
+times out cannot simply be repeated — run it from a queued job that reconciles with
+`getPackagesByReference()` on failure, and report back with a notification. Reads are safe to
+call inline, but Correos can be slow enough that a page action needs its own, shorter timeout.
+
+**Serve the PDF from the action.** `decodedPdf()` gives you the bytes directly:
+
+```php
+Action::make('label')
+    ->action(fn (Shipment $record) => response()->streamDownload(
+        fn () => print $correos->labels()->printLabels($record->labelRequest())->decodedPdf(),
+        "etiqueta-{$record->shipment_code}.pdf",
+    ));
+```
+
+Catching the failure is one `try`, and `errorCode` / `moreInformation` make a better
+notification body than the raw message, which falls back to the response body when Correos
+answers without one:
+
+```php
+} catch (CorreosApiException $e) {
+    Notification::make()
+        ->danger()
+        ->title(__('The label could not be printed'))
+        ->body($e->moreInformation ?? $e->errorCode)
+        ->send();
+}
+```
+
+**Selects and DTO properties.** `Enum::options()` feeds `Select::make(...)->options(...)`
+straight; note PHP turns numeric string values into integer keys, so cast back when
+hydrating a string-backed enum from form state (`ShipmentType::from((string) $state)`). And if
+you want to hold a DTO in a public component property, turn on spatie's Livewire
+synthesizers — they ship disabled:
+
+```php
+// config/data.php
+'livewire' => [
+    'enable_synths' => true,
+],
 ```
 
 ## Testing
