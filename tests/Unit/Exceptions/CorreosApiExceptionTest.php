@@ -1,0 +1,112 @@
+<?php
+
+use Illuminate\Support\Facades\Cache;
+use Saloon\Http\Faking\MockClient;
+use Saloon\Http\Faking\MockResponse;
+use SmartDato\CorreosShipping\Auth\CorreosAuthenticator;
+use SmartDato\CorreosShipping\Connectors\LabelsConnector;
+use SmartDato\CorreosShipping\Data\Labels\PrintLabelsRequestData;
+use SmartDato\CorreosShipping\Exceptions\CorreosApiException;
+use SmartDato\CorreosShipping\Requests\Labels\PrintLabelsRequest;
+
+beforeEach(function () {
+    Cache::put(
+        (new CorreosAuthenticator('id', 'secret', 'https://example.com/token', 'AP3', 'gw-id', 'gw-secret'))->cacheKey(),
+        'fake-test-token',
+        3600,
+    );
+});
+
+function errorException(array|string $body, int $status = 400): CorreosApiException
+{
+    config()->set('correos-shipping-sdk.base_urls.labels', 'https://api1.correos.es/support/labels/api/v1');
+
+    $connector = new LabelsConnector(
+        new CorreosAuthenticator('id', 'secret', 'https://example.com/token', 'AP3', 'gw-id', 'gw-secret')
+    );
+    $connector->withMockClient(new MockClient([
+        PrintLabelsRequest::class => MockResponse::make($body, $status),
+    ]));
+
+    $response = $connector->send(new PrintLabelsRequest(PrintLabelsRequestData::from([
+        'documentationType' => 1,
+        'application' => 'OLC',
+        'print' => [
+            'shipments' => ['PQXYZ1234567890'],
+            'labelFormat' => 2,
+            'labelPrintMode' => 1,
+        ],
+    ])));
+
+    return $response->toException();
+}
+
+it('keeps string error fields as they are', function () {
+    $exception = errorException([
+        'message' => 'Bad Request',
+        'code' => 'ERR-42',
+        'moreInformation' => 'The shipment code is unknown',
+    ]);
+
+    expect($exception)->toBeInstanceOf(CorreosApiException::class)
+        ->and($exception->getMessage())->toBe('Bad Request')
+        ->and($exception->getCode())->toBe(400)
+        ->and($exception->errorCode)->toBe('ERR-42')
+        ->and($exception->moreInformation)->toBe('The shipment code is unknown');
+});
+
+it('joins a list of error details into one string', function () {
+    $exception = errorException([
+        'message' => 'Debe informar los campos obligatorios',
+        'moreInformation' => ['application is mandatory', 'print is mandatory'],
+    ]);
+
+    expect($exception->moreInformation)->toBe('application is mandatory; print is mandatory');
+});
+
+it('encodes structured error details as json', function () {
+    $exception = errorException([
+        'message' => 'Validation failed',
+        'moreInformation' => [
+            ['field' => 'application', 'description' => 'mandatory'],
+        ],
+    ]);
+
+    expect($exception->moreInformation)->toBe('[{"field":"application","description":"mandatory"}]');
+});
+
+it('renders an error message that is not a string', function () {
+    $exception = errorException([
+        'message' => ['first problem', 'second problem'],
+    ]);
+
+    expect($exception->getMessage())->toBe('first problem; second problem');
+});
+
+it('casts a numeric error code to a string', function () {
+    $exception = errorException([
+        'message' => 'Validation failed',
+        'code' => 1234,
+    ]);
+
+    expect($exception->errorCode)->toBe('1234');
+});
+
+it('treats empty error details as absent', function () {
+    $exception = errorException([
+        'message' => 'Validation failed',
+        'code' => '',
+        'moreInformation' => [],
+    ]);
+
+    expect($exception->errorCode)->toBeNull()
+        ->and($exception->moreInformation)->toBeNull();
+});
+
+it('falls back to the raw body when the response is not json', function () {
+    $exception = errorException('<html>Gateway timeout</html>', 504);
+
+    expect($exception->getMessage())->toBe('<html>Gateway timeout</html>')
+        ->and($exception->getCode())->toBe(504)
+        ->and($exception->moreInformation)->toBeNull();
+});
