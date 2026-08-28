@@ -39,12 +39,20 @@ class CorreosShipping
      *     tracking_url?: string,
      *     verify_ssl?: bool,
      *     force_ip_resolve?: string,
+     *     retry_times?: int,
+     *     retry_interval?: int,
+     *     retry_exponential_backoff?: bool,
+     *     user_agent?: string,
      * }  $config
      */
     public static function make(array $config): self
     {
         $verifySsl = $config['verify_ssl'] ?? true;
         $forceIpResolve = $config['force_ip_resolve'] ?? null;
+        $tries = $config['retry_times'] ?? null;
+        $retryInterval = $config['retry_interval'] ?? null;
+        $useExponentialBackoff = $config['retry_exponential_backoff'] ?? null;
+        $userAgent = $config['user_agent'] ?? null;
 
         $auth = new CorreosAuthenticator(
             oauthClientId: $config['oauth_client_id'],
@@ -58,9 +66,9 @@ class CorreosShipping
         );
 
         return new self(
-            new PreregisterConnector($auth, $config['preregister_url'] ?? null, $verifySsl, $forceIpResolve),
-            new LabelsConnector($auth, $config['labels_url'] ?? null, $verifySsl, $forceIpResolve),
-            new TrackingConnector($auth, $config['tracking_url'] ?? null, $verifySsl, $forceIpResolve),
+            new PreregisterConnector($auth, $config['preregister_url'] ?? null, $verifySsl, $forceIpResolve, $tries, $retryInterval, $useExponentialBackoff, $userAgent),
+            new LabelsConnector($auth, $config['labels_url'] ?? null, $verifySsl, $forceIpResolve, $tries, $retryInterval, $useExponentialBackoff, $userAgent),
+            new TrackingConnector($auth, $config['tracking_url'] ?? null, $verifySsl, $forceIpResolve, $tries, $retryInterval, $useExponentialBackoff, $userAgent),
         );
     }
 

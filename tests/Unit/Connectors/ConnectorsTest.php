@@ -65,3 +65,37 @@ it('connectors do not set force_ip_resolve when null', function () {
 
     expect($config)->not->toHaveKey('force_ip_resolve');
 });
+
+it('connectors identify the sdk in the user agent', function () {
+    $connector = new PreregisterConnector(makeAuthenticator());
+
+    expect($connector->headers()->get('User-Agent'))->toStartWith('SmartDato-CorreosShippingSDK');
+});
+
+it('connectors accept a custom user agent', function () {
+    $connector = new PreregisterConnector(makeAuthenticator(), userAgent: 'LaAnonima/2.1');
+
+    expect($connector->headers()->get('User-Agent'))->toBe('LaAnonima/2.1');
+});
+
+it('connectors retry three times with exponential backoff by default', function () {
+    $connector = new PreregisterConnector(makeAuthenticator());
+
+    expect($connector->tries)->toBe(3)
+        ->and($connector->retryInterval)->toBe(500)
+        ->and($connector->useExponentialBackoff)->toBeTrue();
+});
+
+it('connectors resolved from the container follow the retry config', function () {
+    config()->set('correos-shipping-sdk.retry.times', 5);
+    config()->set('correos-shipping-sdk.retry.interval', 100);
+    config()->set('correos-shipping-sdk.retry.exponential_backoff', false);
+    config()->set('correos-shipping-sdk.user_agent', 'LaAnonima/1.0');
+
+    $connector = app(PreregisterConnector::class);
+
+    expect($connector->tries)->toBe(5)
+        ->and($connector->retryInterval)->toBe(100)
+        ->and($connector->useExponentialBackoff)->toBeFalse()
+        ->and($connector->headers()->get('User-Agent'))->toBe('LaAnonima/1.0');
+});

@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": "^8.4",
+        "composer-runtime-api": "^2.2",
         "illuminate/contracts": "^11.0||^12.0||^13.0",
         "saloonphp/saloon": "^4.0",
         "spatie/laravel-data": "^4.19",
@@ -37,14 +38,12 @@
     },
     "autoload": {
         "psr-4": {
-            "SmartDato\\CorreosShipping\\": "src/",
-            "SmartDato\\CorreosShipping\\Database\\Factories\\": "database/factories/"
+            "SmartDato\\CorreosShipping\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "SmartDato\\CorreosShipping\\Tests\\": "tests/",
-            "Workbench\\App\\": "workbench/app/"
+            "SmartDato\\CorreosShipping\\Tests\\": "tests/"
         }
     },
     "scripts": {
