@@ -30,6 +30,8 @@ abstract class CorreosConnector extends Connector
         ?int $retryInterval = null,
         ?bool $useExponentialBackoff = null,
         protected ?string $userAgent = null,
+        protected ?int $timeout = null,
+        protected ?int $connectTimeout = null,
     ) {
         $this->tries = $tries ?? self::DEFAULT_TRIES;
         $this->retryInterval = $retryInterval ?? self::DEFAULT_RETRY_INTERVAL;
@@ -44,6 +46,15 @@ abstract class CorreosConnector extends Connector
 
         if ($this->forceIpResolve) {
             $config['force_ip_resolve'] = $this->forceIpResolve;
+        }
+
+        // Left unset, Saloon's own defaults apply (30s request, 10s connect).
+        if ($this->timeout !== null) {
+            $config['timeout'] = $this->timeout;
+        }
+
+        if ($this->connectTimeout !== null) {
+            $config['connect_timeout'] = $this->connectTimeout;
         }
 
         return $config;

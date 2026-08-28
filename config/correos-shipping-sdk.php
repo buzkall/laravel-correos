@@ -32,6 +32,14 @@ return [
     ],
 
     /*
+     * Guzzle timeouts, in seconds. Left null, Saloon's defaults apply (30s for
+     * the request, 10s to connect). Lower them on interactive paths, where a
+     * user is waiting for the answer.
+     */
+    'timeout' => env('CORREOS_TIMEOUT'),
+    'connect_timeout' => env('CORREOS_CONNECT_TIMEOUT'),
+
+    /*
      * Overrides the User-Agent header sent to Correos. Defaults to the SDK name
      * and the installed package version.
      */

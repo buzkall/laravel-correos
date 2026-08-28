@@ -99,3 +99,33 @@ it('connectors resolved from the container follow the retry config', function ()
         ->and($connector->useExponentialBackoff)->toBeFalse()
         ->and($connector->headers()->get('User-Agent'))->toBe('LaAnonima/1.0');
 });
+
+it('connectors leave the timeouts unset so saloon defaults apply', function () {
+    $connector = new PreregisterConnector(makeAuthenticator());
+
+    expect($connector->config()->all())->not->toHaveKey('timeout')
+        ->and($connector->config()->all())->not->toHaveKey('connect_timeout');
+});
+
+it('connectors accept timeouts', function () {
+    $connector = new PreregisterConnector(makeAuthenticator(), timeout: 8, connectTimeout: 3);
+
+    expect($connector->config()->all())->toHaveKey('timeout', 8)
+        ->toHaveKey('connect_timeout', 3);
+});
+
+it('connectors resolved from the container follow the timeout config', function () {
+    config()->set('correos-shipping-sdk.timeout', '8');
+    config()->set('correos-shipping-sdk.connect_timeout', '3');
+
+    $connector = app(LabelsConnector::class);
+
+    expect($connector->config()->all())->toHaveKey('timeout', 8)
+        ->toHaveKey('connect_timeout', 3);
+});
+
+it('connectors resolved from the container leave unset timeouts alone', function () {
+    $connector = app(TrackingConnector::class);
+
+    expect($connector->config()->all())->not->toHaveKey('timeout');
+});
