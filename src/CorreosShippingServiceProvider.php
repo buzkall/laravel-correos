@@ -18,6 +18,15 @@ class CorreosShippingServiceProvider extends PackageServiceProvider
             ->hasConfigFile();
     }
 
+    /**
+     * Timeouts are optional: an unset config key leaves Saloon's default in
+     * place rather than sending a zero.
+     */
+    protected function optionalInt(mixed $value): ?int
+    {
+        return is_numeric($value) ? (int) $value : null;
+    }
+
     public function packageRegistered(): void
     {
         $this->app->singleton(CorreosAuthenticator::class, function () {
@@ -42,6 +51,8 @@ class CorreosShippingServiceProvider extends PackageServiceProvider
                 retryInterval: (int) config('correos-shipping-sdk.retry.interval', 500),
                 useExponentialBackoff: (bool) config('correos-shipping-sdk.retry.exponential_backoff', true),
                 userAgent: config('correos-shipping-sdk.user_agent'),
+                timeout: $this->optionalInt(config('correos-shipping-sdk.timeout')),
+                connectTimeout: $this->optionalInt(config('correos-shipping-sdk.connect_timeout')),
             );
         });
 
@@ -54,6 +65,8 @@ class CorreosShippingServiceProvider extends PackageServiceProvider
                 retryInterval: (int) config('correos-shipping-sdk.retry.interval', 500),
                 useExponentialBackoff: (bool) config('correos-shipping-sdk.retry.exponential_backoff', true),
                 userAgent: config('correos-shipping-sdk.user_agent'),
+                timeout: $this->optionalInt(config('correos-shipping-sdk.timeout')),
+                connectTimeout: $this->optionalInt(config('correos-shipping-sdk.connect_timeout')),
             );
         });
 
@@ -66,6 +79,8 @@ class CorreosShippingServiceProvider extends PackageServiceProvider
                 retryInterval: (int) config('correos-shipping-sdk.retry.interval', 500),
                 useExponentialBackoff: (bool) config('correos-shipping-sdk.retry.exponential_backoff', true),
                 userAgent: config('correos-shipping-sdk.user_agent'),
+                timeout: $this->optionalInt(config('correos-shipping-sdk.timeout')),
+                connectTimeout: $this->optionalInt(config('correos-shipping-sdk.connect_timeout')),
             );
         });
 

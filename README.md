@@ -68,6 +68,8 @@ return [
         'interval'            => env('CORREOS_RETRY_INTERVAL', 500), // milliseconds
         'exponential_backoff' => env('CORREOS_RETRY_EXPONENTIAL_BACKOFF', true),
     ],
+    'timeout' => env('CORREOS_TIMEOUT'),                  // seconds; Saloon default 30
+    'connect_timeout' => env('CORREOS_CONNECT_TIMEOUT'),  // seconds; Saloon default 10
     'user_agent' => env('CORREOS_USER_AGENT'),
 ];
 ```
@@ -179,7 +181,8 @@ $labelRequest = PrintLabelsRequestData::from([
 
 $labels = $correos->labels()->printLabels($labelRequest);
 
-$labels->pdf;  // Base64-encoded PDF content
+$labels->pdf;            // Base64-encoded PDF content
+$labels->decodedPdf();   // The same PDF as raw bytes, or null if there is none
 ```
 
 `labelPrintMode` decides what that PDF contains, and the two modes are not interchangeable:
@@ -199,7 +202,7 @@ $pdf = new Fpdi;
 $pdf->AddPage();
 
 $pages = $pdf->setSourceFile(
-    StreamReader::createByString(base64_decode($labels->pdf))
+    StreamReader::createByString($labels->decodedPdf())
 );
 
 // 2 columns x 4 rows of 105mm x 74.25mm cells on A4.
@@ -333,6 +336,14 @@ use SmartDato\CorreosShipping\Enums\AdmissionMethod;     // Office, Citypaq, Del
 use SmartDato\CorreosShipping\Enums\ErrorCodeLanguage;   // Spanish, English
 ```
 
+Each case carries a human readable `label()`, and every enum exposes `options()` — value =>
+label pairs, ready for a select input:
+
+```php
+ProductCode::PaqPremium->label();  // "Paq Premium"
+LabelPrintMode::options();         // [1 => 'A4 sheet', 2 => 'Labeler']
+```
+
 ## Error Handling
 
 API errors are thrown as `CorreosApiException`, which extends Saloon's `RequestException`:
@@ -429,6 +440,72 @@ Override it if Correos asks you to identify your own application:
 
 ```env
 CORREOS_USER_AGENT="LaAnonima/2.1"
+```
+
+## Using it from Filament (or any Livewire component)
+
+Nothing special is needed to call the SDK from a Filament page or action — but four things
+are worth knowing.
+
+**Strip nulls before hydrating a DTO.** Optional fields are typed `string|Optional`, and a
+Filament form submits `null` for the ones the user left alone, which is a `TypeError` rather
+than a validation error:
+
+```php
+$clean = fn (array $values) => collect($values)
+    ->map(fn ($value) => is_array($value) ? $clean($value) : $value)
+    ->reject(fn ($value) => $value === null || $value === '' || $value === [])
+    ->all();
+
+$request = DeliveryRequestData::from($clean($this->form->getState()));
+```
+
+**Keep writes off the request cycle.** `createShipments()` is not idempotent and is not
+retried on transport failures, so run it from a queued job and report back with a
+notification. If you do call the API inline, lower the timeouts for that path — the defaults
+(30s per attempt, three attempts on reads) are sized for a worker, not for someone watching a
+spinner:
+
+```env
+CORREOS_TIMEOUT=8
+CORREOS_CONNECT_TIMEOUT=3
+```
+
+**Serve the PDF from the action.** `decodedPdf()` gives you the bytes directly:
+
+```php
+Action::make('label')
+    ->action(fn (Shipment $record) => response()->streamDownload(
+        fn () => print $correos->labels()->printLabels($record->labelRequest())->decodedPdf(),
+        "etiqueta-{$record->shipment_code}.pdf",
+    ));
+```
+
+Catching the failure is one `try`, and `errorCode` / `moreInformation` make a better
+notification body than the raw message, which falls back to the response body when Correos
+answers without one:
+
+```php
+} catch (CorreosApiException $e) {
+    Notification::make()
+        ->danger()
+        ->title(__('The label could not be printed'))
+        ->body($e->moreInformation ?? $e->errorCode)
+        ->send();
+}
+```
+
+**Selects and DTO properties.** `Enum::options()` feeds `Select::make(...)->options(...)`
+straight; note PHP turns numeric string values into integer keys, so cast back when
+hydrating a string-backed enum from form state (`ShipmentType::from((string) $state)`). And if
+you want to hold a DTO in a public component property, turn on spatie's Livewire
+synthesizers — they ship disabled:
+
+```php
+// config/data.php
+'livewire' => [
+    'enable_synths' => true,
+],
 ```
 
 ## Testing
