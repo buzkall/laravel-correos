@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Cache;
-use RuntimeException;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
 use SmartDato\CorreosShipping\Auth\CorreosAuthenticator;
