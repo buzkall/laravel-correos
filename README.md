@@ -61,6 +61,14 @@ return [
     ],
     'verify_ssl' => env('CORREOS_VERIFY_SSL', true),
     'force_ip_resolve' => env('CORREOS_FORCE_IP_RESOLVE'),
+    'retry' => [
+        'times'               => env('CORREOS_RETRY_TIMES', 3),
+        'interval'            => env('CORREOS_RETRY_INTERVAL', 500), // milliseconds
+        'exponential_backoff' => env('CORREOS_RETRY_EXPONENTIAL_BACKOFF', true),
+    ],
+    'timeout' => env('CORREOS_TIMEOUT'),                  // seconds; Saloon default 30
+    'connect_timeout' => env('CORREOS_CONNECT_TIMEOUT'),  // seconds; Saloon default 10
+    'user_agent' => env('CORREOS_USER_AGENT'),
 ];
 ```
 
@@ -286,7 +294,7 @@ use SmartDato\CorreosShipping\Enums\ErrorCodeLanguage;   // Spanish, English
 
 ## Error Handling
 
-API errors are thrown as `CorreosApiException`:
+API errors are thrown as `CorreosApiException`, which extends Saloon's `RequestException`:
 
 ```php
 use SmartDato\CorreosShipping\Exceptions\CorreosApiException;
@@ -294,11 +302,103 @@ use SmartDato\CorreosShipping\Exceptions\CorreosApiException;
 try {
     $response = $correos->preregister()->createShipments($request);
 } catch (CorreosApiException $e) {
-    $e->getMessage();         // Error message from the API
-    $e->getCode();            // HTTP status code
-    $e->errorCode;            // Correos error code
+    $e->getMessage();        // Error message from the API
+    $e->getCode();           // HTTP status code
+    $e->errorCode;           // Correos error code
     $e->moreInformation;     // Additional error details
+    $e->getResponse();       // The raw Saloon response, for logging
 }
+```
+
+### Errors returned with a 200
+
+Part of the Correos surface answers failures with HTTP 200 and an `error` field rather than
+an error status — printing a label for an unknown shipment comes back as `200` with a null
+`pdf` and a filled `error`. Those payloads are turned into the same `CorreosApiException`, so
+a call that returns a DTO has returned a usable one:
+
+```php
+$labels = $correos->labels()->printLabels($labelRequest);
+
+// Never reached when Correos answered `{"pdf": null, "error": "El envío no existe"}`.
+$pdf = base64_decode($labels->pdf);
+```
+
+The check covers the top-level `error`/`errors` field of every response. Nested errors stay on
+the DTO, because there they are the answer rather than a failure: `validateShipments()` still
+returns its per-shipment `validationErrorCount` and `error` list without throwing.
+
+The raw response of the last call — including a failed one — is available on the resource:
+
+```php
+$correos->labels()->lastResponse()?->body();
+```
+
+## Retries
+
+The API gateway rate limits, so transient failures are retried three times with exponential
+backoff, starting at 500 ms:
+
+```env
+CORREOS_RETRY_TIMES=3
+CORREOS_RETRY_INTERVAL=500
+CORREOS_RETRY_EXPONENTIAL_BACKOFF=true
+```
+
+Set `CORREOS_RETRY_TIMES=1` to switch retries off.
+
+What is retried is deliberately narrow, because a retried write can book the same shipment
+twice:
+
+| Failure | Read (`GET`) | Write (`POST`) |
+| --- | --- | --- |
+| `429 Too Many Requests` | retried | retried — the gateway rejected it before Correos saw it |
+| `408`, `5xx` | retried | **not** retried |
+| Connection error, timeout | retried | **not** retried |
+| Any other `4xx` | not retried | not retried |
+
+A write that fails on a timeout or a gateway error may well have been processed, so it is
+surfaced to you instead of being repeated. See [Idempotency](#idempotency) for how to settle
+one.
+
+### Timeouts
+
+Each attempt runs under Saloon's defaults — 30 seconds for the request, 10 to connect — so a
+hanging gateway can hold a caller for minutes once retries are counted in. Tighten them where
+someone is waiting for the answer:
+
+```env
+CORREOS_TIMEOUT=8
+CORREOS_CONNECT_TIMEOUT=3
+```
+
+## Idempotency
+
+`createShipments()` is not idempotent: a request that times out after Correos has registered
+the shipment leaves you unable to tell success from failure, and sending it again books a
+duplicate. Guard it in your own service layer:
+
+1. Give every package a stable reference of your own (`clientReference` on `PackageData`) and
+   store it, with the resulting shipment and package codes, against your order.
+2. Before creating, skip orders that already carry a shipment code.
+3. After a timeout or a `5xx`, reconcile rather than retry — ask Correos what it holds under
+   that reference:
+
+```php
+$packages = $correos->preregister()->getPackagesByReference('ORDER-10231');
+
+if ($packages->packageCodes) {
+    // Already registered: store the codes instead of creating the shipment again.
+}
+```
+
+## User agent
+
+Requests identify the SDK and its installed version (`SmartDato-CorreosShippingSDK/1.2.3`).
+Override it if Correos asks you to identify your own application:
+
+```env
+CORREOS_USER_AGENT="LaAnonima/2.1"
 ```
 
 ## Testing
