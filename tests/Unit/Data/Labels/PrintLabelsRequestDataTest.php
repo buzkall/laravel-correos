@@ -39,8 +39,7 @@ it('serializes print labels request data without optional fields', function (): 
 });
 
 it('deserializes labels response data', function (): void {
-    $json = file_get_contents(__DIR__.'/../../../Fixtures/labels/labels_response.json');
-    $data = LabelsResponseData::from(json_decode($json, true));
+    $data = LabelsResponseData::from(fixtureJson('labels/labels_response.json'));
 
     expect($data->pdf)->toBe('JVBERi0xLjQgZmFrZSBwZGYgY29udGVudA==')
         ->and($data->zpl)->toBeNull()

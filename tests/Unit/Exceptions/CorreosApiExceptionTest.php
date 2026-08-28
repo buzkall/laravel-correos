@@ -20,6 +20,9 @@ beforeEach(function (): void {
     );
 });
 
+/**
+ * @param  array<string, mixed>|string  $body
+ */
 function errorException(array|string $body, int $status = 400): CorreosApiException
 {
     config()->set('correos-shipping-sdk.base_urls.labels', 'https://api1.correos.es/support/labels/api/v1');

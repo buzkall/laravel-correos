@@ -25,6 +25,9 @@ class PrintDocumentsRequest extends Request implements HasBody
         return '/documents/print';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function defaultBody(): array
     {
         return $this->data->toArray();

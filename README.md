@@ -305,7 +305,7 @@ try {
 
 ```bash
 composer test             # Run tests (Pest 5)
-composer analyse          # Static analysis of src, config and tests (PHPStan level 5)
+composer analyse          # Static analysis of src, config and tests (PHPStan level 7)
 composer format           # Code style (Laravel Pint)
 composer rector-dry       # Preview automated refactors (Rector)
 composer rector           # Apply automated refactors (Rector)

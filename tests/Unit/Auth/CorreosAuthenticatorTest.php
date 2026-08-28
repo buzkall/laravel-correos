@@ -8,9 +8,12 @@ use SmartDato\CorreosShipping\Data\Labels\PrintLabelsRequestData;
 use SmartDato\CorreosShipping\Requests\Labels\PrintLabelsRequest;
 use SmartDato\CorreosShipping\Tests\Doubles\TestableCorreosAuthenticator;
 
+/**
+ * @param  array<string, mixed>  $claims
+ */
 function fakeCorreosJwt(array $claims): string
 {
-    $encode = fn (array $data): string => rtrim(strtr(base64_encode(json_encode($data)), '+/', '-_'), '=');
+    $encode = fn (array $data): string => rtrim(strtr(base64_encode(json_encode($data, JSON_THROW_ON_ERROR)), '+/', '-_'), '=');
 
     return $encode(['alg' => 'RS256', 'typ' => 'JWT']).'.'.$encode($claims).'.signature';
 }

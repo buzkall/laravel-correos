@@ -25,6 +25,9 @@ class QueryShipmentsRequest extends Request implements HasBody
         return '/delivery/package';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function defaultBody(): array
     {
         return $this->data->toArray();

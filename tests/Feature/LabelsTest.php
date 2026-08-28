@@ -31,7 +31,7 @@ function labelsConnector(): LabelsConnector
 it('prints labels and returns pdf', function (): void {
     $mockClient = new MockClient([
         PrintLabelsRequest::class => MockResponse::make(
-            json_decode(file_get_contents(__DIR__.'/../Fixtures/labels/labels_response.json'), true)
+            fixtureJson('labels/labels_response.json')
         ),
     ]);
 
@@ -59,7 +59,7 @@ it('prints labels and returns pdf', function (): void {
 it('prints documents and returns pdf', function (): void {
     $mockClient = new MockClient([
         PrintDocumentsRequest::class => MockResponse::make(
-            json_decode(file_get_contents(__DIR__.'/../Fixtures/labels/document_response.json'), true)
+            fixtureJson('labels/document_response.json')
         ),
     ]);
 

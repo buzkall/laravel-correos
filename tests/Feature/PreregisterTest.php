@@ -33,11 +33,6 @@ function preregisterConnector(): PreregisterConnector
     );
 }
 
-function fixtureJson(string $path): array
-{
-    return json_decode(file_get_contents(__DIR__.'/../Fixtures/'.$path), true);
-}
-
 it('creates shipments and returns delivery response', function (): void {
     $mockClient = new MockClient([
         CreateShipmentsRequest::class => MockResponse::make(fixtureJson('preregister/delivery_response.json')),

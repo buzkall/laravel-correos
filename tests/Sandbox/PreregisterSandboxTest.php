@@ -14,6 +14,7 @@
 use Dotenv\Dotenv;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use RuntimeException;
 use SmartDato\CorreosShipping\Auth\CorreosAuthenticator;
 use SmartDato\CorreosShipping\Connectors\PreregisterConnector;
 use SmartDato\CorreosShipping\Data\Preregister\DeliveryRequestData;
@@ -35,6 +36,20 @@ function loadSandboxEnv(): void
     }
 }
 
+/**
+ * Read a required value from .env.testing as a string.
+ */
+function sandboxEnv(string $key, ?string $default = null): string
+{
+    $value = env($key, $default);
+
+    if (! is_string($value) || $value === '') {
+        throw new RuntimeException("The sandbox environment variable {$key} is not set in .env.testing.");
+    }
+
+    return $value;
+}
+
 function sandboxPreregisterConnector(): PreregisterConnector
 {
     loadSandboxEnv();
@@ -44,16 +59,16 @@ function sandboxPreregisterConnector(): PreregisterConnector
     Http::globalOptions(['verify' => false]);
 
     $auth = new CorreosAuthenticator(
-        oauthClientId: env('CORREOS_OAUTH_CLIENT_ID'),
-        oauthClientSecret: env('CORREOS_OAUTH_CLIENT_SECRET'),
-        tokenUrl: env('CORREOS_TOKEN_URL'),
-        scope: env('CORREOS_OAUTH_SCOPE', 'AP3 LBS RCG'),
-        gatewayClientId: env('CORREOS_GATEWAY_CLIENT_ID'),
-        gatewayClientSecret: env('CORREOS_GATEWAY_CLIENT_SECRET'),
+        oauthClientId: sandboxEnv('CORREOS_OAUTH_CLIENT_ID'),
+        oauthClientSecret: sandboxEnv('CORREOS_OAUTH_CLIENT_SECRET'),
+        tokenUrl: sandboxEnv('CORREOS_TOKEN_URL'),
+        scope: sandboxEnv('CORREOS_OAUTH_SCOPE', 'AP3 LBS RCG'),
+        gatewayClientId: sandboxEnv('CORREOS_GATEWAY_CLIENT_ID'),
+        gatewayClientSecret: sandboxEnv('CORREOS_GATEWAY_CLIENT_SECRET'),
         verifySsl: false,
     );
 
-    $connector = new PreregisterConnector($auth, env('CORREOS_PREREGISTER_URL'));
+    $connector = new PreregisterConnector($auth, sandboxEnv('CORREOS_PREREGISTER_URL'));
 
     // Disable SSL for Saloon connector (Guzzle config)
     // Force IPv4 — PRE sandbox only whitelists IPv4, IPv6 gets 403 from CloudFront
@@ -112,11 +127,11 @@ it('can obtain an OAuth token from the PRE sandbox', function (): void {
 
     Http::globalOptions(['verify' => false]);
 
-    $tokenResponse = Http::asForm()->post(env('CORREOS_TOKEN_URL'), [
+    $tokenResponse = Http::asForm()->post(sandboxEnv('CORREOS_TOKEN_URL'), [
         'grant_type' => 'client_credentials',
-        'client_id' => env('CORREOS_OAUTH_CLIENT_ID'),
-        'client_secret' => env('CORREOS_OAUTH_CLIENT_SECRET'),
-        'scope' => env('CORREOS_OAUTH_SCOPE', 'AP3 LBS RCG'),
+        'client_id' => sandboxEnv('CORREOS_OAUTH_CLIENT_ID'),
+        'client_secret' => sandboxEnv('CORREOS_OAUTH_CLIENT_SECRET'),
+        'scope' => sandboxEnv('CORREOS_OAUTH_SCOPE', 'AP3 LBS RCG'),
     ]);
 
     dump('Token HTTP status:', $tokenResponse->status());

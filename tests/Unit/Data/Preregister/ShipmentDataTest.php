@@ -7,24 +7,20 @@ use SmartDato\CorreosShipping\Data\Preregister\SenderData;
 use SmartDato\CorreosShipping\Enums\ProductCode;
 
 it('creates delivery request data from array', function (): void {
-    $json = file_get_contents(__DIR__.'/../../../Fixtures/preregister/delivery_request.json');
-    $data = DeliveryRequestData::from(json_decode($json, true));
+    $data = DeliveryRequestData::from(fixtureJson('preregister/delivery_request.json'));
 
     expect($data->shipments)->toHaveCount(1)
         ->and($data->shipments[0]->product)->toBe(ProductCode::PaqPremium)
         ->and($data->shipments[0]->deliveryMethod)->toBe('DOUAOF')
         ->and($data->shipments[0]->contractNumber)->toBe('12345678')
-        ->and($data->shipments[0]->sender)->toBeInstanceOf(SenderData::class)
-        ->and($data->shipments[0]->sender->name)->toBe('Test Sender')
-        ->and($data->shipments[0]->addressee)->toBeInstanceOf(AddresseeData::class)
-        ->and($data->shipments[0]->addressee->name)->toBe('Test Addressee')
+        ->and(present($data->shipments[0]->sender, SenderData::class)->name)->toBe('Test Sender')
+        ->and(present($data->shipments[0]->addressee, AddresseeData::class)->name)->toBe('Test Addressee')
         ->and($data->shipments[0]->packages)->toHaveCount(1)
         ->and($data->shipments[0]->packages[0]->packageWeightGrams)->toBe('500');
 });
 
 it('serializes delivery request data to array', function (): void {
-    $json = file_get_contents(__DIR__.'/../../../Fixtures/preregister/delivery_request.json');
-    $data = DeliveryRequestData::from(json_decode($json, true));
+    $data = DeliveryRequestData::from(fixtureJson('preregister/delivery_request.json'));
     $array = $data->toArray();
 
     expect($array)->toHaveKey('shipments')
@@ -36,8 +32,7 @@ it('serializes delivery request data to array', function (): void {
 });
 
 it('deserializes delivery response data', function (): void {
-    $json = file_get_contents(__DIR__.'/../../../Fixtures/preregister/delivery_response.json');
-    $data = DeliveryResponseData::from(json_decode($json, true));
+    $data = DeliveryResponseData::from(fixtureJson('preregister/delivery_response.json'));
 
     expect($data->fileIdentifier)->toBe('FILE001')
         ->and($data->result)->toBe(1)

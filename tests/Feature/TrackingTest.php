@@ -29,7 +29,7 @@ function trackingConnector(): TrackingConnector
 it('searches for a shipment', function (): void {
     $mockClient = new MockClient([
         SearchShipmentRequest::class => MockResponse::make(
-            json_decode(file_get_contents(__DIR__.'/../Fixtures/tracking/search_response.json'), true)
+            fixtureJson('tracking/search_response.json')
         ),
     ]);
 
@@ -53,7 +53,7 @@ it('searches for a shipment', function (): void {
 it('gets expedition details', function (): void {
     $mockClient = new MockClient([
         GetExpeditionRequest::class => MockResponse::make(
-            json_decode(file_get_contents(__DIR__.'/../Fixtures/tracking/expedition_response.json'), true)
+            fixtureJson('tracking/expedition_response.json')
         ),
     ]);
 

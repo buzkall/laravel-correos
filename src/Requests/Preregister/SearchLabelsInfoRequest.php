@@ -25,6 +25,9 @@ class SearchLabelsInfoRequest extends Request implements HasBody
         return '/labels/info/search';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function defaultBody(): array
     {
         return $this->data->toArray();
