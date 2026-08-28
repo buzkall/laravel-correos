@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use SmartDato\CorreosShipping\Auth\CorreosAuthenticator;
 use SmartDato\CorreosShipping\Connectors\LabelsConnector;
 use SmartDato\CorreosShipping\Connectors\PreregisterConnector;
@@ -17,7 +19,7 @@ function makeAuthenticator(): CorreosAuthenticator
     );
 }
 
-it('preregister connector resolves correct base url', function () {
+it('preregister connector resolves correct base url', function (): void {
     config()->set('correos-shipping-sdk.base_urls.preregister', 'https://api1.correos.es/admissions/preregister/api/v1');
 
     $connector = new PreregisterConnector(makeAuthenticator());
@@ -25,7 +27,7 @@ it('preregister connector resolves correct base url', function () {
     expect($connector->resolveBaseUrl())->toBe('https://api1.correos.es/admissions/preregister/api/v1');
 });
 
-it('labels connector resolves correct base url', function () {
+it('labels connector resolves correct base url', function (): void {
     config()->set('correos-shipping-sdk.base_urls.labels', 'https://api1.correos.es/support/labels/api/v1');
 
     $connector = new LabelsConnector(makeAuthenticator());
@@ -33,7 +35,7 @@ it('labels connector resolves correct base url', function () {
     expect($connector->resolveBaseUrl())->toBe('https://api1.correos.es/support/labels/api/v1');
 });
 
-it('tracking connector resolves correct base url', function () {
+it('tracking connector resolves correct base url', function (): void {
     config()->set('correos-shipping-sdk.base_urls.tracking', 'https://api1.correos.es/support/trackpub/api/v2');
 
     $connector = new TrackingConnector(makeAuthenticator());
@@ -41,7 +43,7 @@ it('tracking connector resolves correct base url', function () {
     expect($connector->resolveBaseUrl())->toBe('https://api1.correos.es/support/trackpub/api/v2');
 });
 
-it('connectors set default json headers', function () {
+it('connectors set default json headers', function (): void {
     $connector = new PreregisterConnector(makeAuthenticator());
 
     $headers = $connector->headers()->all();
@@ -50,7 +52,7 @@ it('connectors set default json headers', function () {
         ->toHaveKey('Content-Type', 'application/json');
 });
 
-it('connectors set force_ip_resolve in config when provided', function () {
+it('connectors set force_ip_resolve in config when provided', function (): void {
     $connector = new PreregisterConnector(makeAuthenticator(), forceIpResolve: 'v4');
 
     $config = $connector->config()->all();
@@ -58,7 +60,7 @@ it('connectors set force_ip_resolve in config when provided', function () {
     expect($config)->toHaveKey('force_ip_resolve', 'v4');
 });
 
-it('connectors do not set force_ip_resolve when null', function () {
+it('connectors do not set force_ip_resolve when null', function (): void {
     $connector = new PreregisterConnector(makeAuthenticator());
 
     $config = $connector->config()->all();

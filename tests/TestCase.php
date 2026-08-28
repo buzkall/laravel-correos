@@ -14,7 +14,7 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'SmartDato\\CorreosShipping\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            fn (string $modelName): string => 'SmartDato\\CorreosShipping\\Database\\Factories\\'.class_basename($modelName).'Factory'
         );
     }
 
@@ -26,7 +26,7 @@ class TestCase extends Orchestra
         ];
     }
 
-    public function getEnvironmentSetUp($app)
+    public function getEnvironmentSetUp($app): void
     {
         config()->set('database.default', 'testing');
 

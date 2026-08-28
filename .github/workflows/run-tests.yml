@@ -24,14 +24,16 @@ jobs:
       fail-fast: true
       matrix:
         os: [ubuntu-latest, windows-latest]
-        php: [8.4, 8.3]
-        laravel: [12.*, 11.*]
+        php: [8.4]
+        laravel: [13.*, 12.*]
         stability: [prefer-lowest, prefer-stable]
         include:
+          - laravel: 13.*
+            testbench: 11.*
+          # Pest 5 runs on PHPUnit 13, which Testbench only supports from 10.10
+          # onwards, so prefer-lowest has to start there for Laravel 12.
           - laravel: 12.*
-            testbench: 10.*
-          - laravel: 11.*
-            testbench: 9.*
+            testbench: ^10.10
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 

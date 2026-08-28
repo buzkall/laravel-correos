@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SmartDato\CorreosShipping\Enums;
 
 enum DoiType: string

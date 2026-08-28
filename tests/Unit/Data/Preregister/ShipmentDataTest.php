@@ -3,17 +3,14 @@
 use SmartDato\CorreosShipping\Data\Preregister\AddresseeData;
 use SmartDato\CorreosShipping\Data\Preregister\DeliveryRequestData;
 use SmartDato\CorreosShipping\Data\Preregister\DeliveryResponseData;
-use SmartDato\CorreosShipping\Data\Preregister\PackageData;
 use SmartDato\CorreosShipping\Data\Preregister\SenderData;
-use SmartDato\CorreosShipping\Data\Preregister\ShipmentData;
 use SmartDato\CorreosShipping\Enums\ProductCode;
 
-it('creates delivery request data from array', function () {
+it('creates delivery request data from array', function (): void {
     $json = file_get_contents(__DIR__.'/../../../Fixtures/preregister/delivery_request.json');
     $data = DeliveryRequestData::from(json_decode($json, true));
 
     expect($data->shipments)->toHaveCount(1)
-        ->and($data->shipments[0])->toBeInstanceOf(ShipmentData::class)
         ->and($data->shipments[0]->product)->toBe(ProductCode::PaqPremium)
         ->and($data->shipments[0]->deliveryMethod)->toBe('DOUAOF')
         ->and($data->shipments[0]->contractNumber)->toBe('12345678')
@@ -22,11 +19,10 @@ it('creates delivery request data from array', function () {
         ->and($data->shipments[0]->addressee)->toBeInstanceOf(AddresseeData::class)
         ->and($data->shipments[0]->addressee->name)->toBe('Test Addressee')
         ->and($data->shipments[0]->packages)->toHaveCount(1)
-        ->and($data->shipments[0]->packages[0])->toBeInstanceOf(PackageData::class)
         ->and($data->shipments[0]->packages[0]->packageWeightGrams)->toBe('500');
 });
 
-it('serializes delivery request data to array', function () {
+it('serializes delivery request data to array', function (): void {
     $json = file_get_contents(__DIR__.'/../../../Fixtures/preregister/delivery_request.json');
     $data = DeliveryRequestData::from(json_decode($json, true));
     $array = $data->toArray();
@@ -39,7 +35,7 @@ it('serializes delivery request data to array', function () {
         ->and($array['shipments'][0]['packages'][0])->toHaveKey('packageWeightGrams', '500');
 });
 
-it('deserializes delivery response data', function () {
+it('deserializes delivery response data', function (): void {
     $json = file_get_contents(__DIR__.'/../../../Fixtures/preregister/delivery_response.json');
     $data = DeliveryResponseData::from(json_decode($json, true));
 
@@ -51,7 +47,7 @@ it('deserializes delivery response data', function () {
         ->and($data->shipments[0]->packages[0]->packageCode)->toBe('PQ1DR4A0000012345678');
 });
 
-it('omits optional fields from serialized output', function () {
+it('omits optional fields from serialized output', function (): void {
     $sender = SenderData::from([
         'name' => 'John',
         'address' => 'Street 1',

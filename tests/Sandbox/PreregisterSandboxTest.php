@@ -106,7 +106,7 @@ function sandboxShipmentRequest(): DeliveryRequestData
     ]);
 }
 
-it('can obtain an OAuth token from the PRE sandbox', function () {
+it('can obtain an OAuth token from the PRE sandbox', function (): void {
     Cache::flush();
     loadSandboxEnv();
 
@@ -122,12 +122,12 @@ it('can obtain an OAuth token from the PRE sandbox', function () {
     dump('Token HTTP status:', $tokenResponse->status());
     dump('Token response:', $tokenResponse->json() ?? $tokenResponse->body());
 
-    expect($tokenResponse->successful())->toBeTrue();
-    expect($tokenResponse->json('idToken'))->not->toBeEmpty();
+    expect($tokenResponse->successful())->toBeTrue()
+        ->and($tokenResponse->json('idToken'))->not->toBeEmpty();
 })->group('sandbox')
-    ->skip(fn () => ! sandboxAvailable(), 'Skipped: .env.testing not found');
+    ->skip(fn (): bool => ! sandboxAvailable(), 'Skipped: .env.testing not found');
 
-it('can validate a shipment against the PRE sandbox', function () {
+it('can validate a shipment against the PRE sandbox', function (): void {
     Cache::flush();
 
     $connector = sandboxPreregisterConnector();
@@ -146,9 +146,9 @@ it('can validate a shipment against the PRE sandbox', function () {
 
     dump('Validate response:', $response->toArray());
 })->group('sandbox')
-    ->skip(fn () => ! sandboxAvailable(), 'Skipped: .env.testing not found');
+    ->skip(fn (): bool => ! sandboxAvailable(), 'Skipped: .env.testing not found');
 
-it('can create a shipment against the PRE sandbox', function () {
+it('can create a shipment against the PRE sandbox', function (): void {
     Cache::flush();
 
     $connector = sandboxPreregisterConnector();
@@ -156,12 +156,11 @@ it('can create a shipment against the PRE sandbox', function () {
 
     $response = $resource->createShipments(sandboxShipmentRequest());
 
-    expect($response)->toBeInstanceOf(DeliveryResponseData::class)
-        ->and($response->shipments)->toBeArray()
+    expect($response->shipments)->toBeArray()
         ->and($response->shipments)->not->toBeEmpty();
 
     dump('Create response:', $response->toArray());
     dump('Shipment code:', $response->shipments[0]->shipmentCode ?? 'N/A');
     dump('Raw HTTP status:', $resource->lastResponse()?->status());
 })->group('sandbox')
-    ->skip(fn () => ! sandboxAvailable(), 'Skipped: .env.testing not found');
+    ->skip(fn (): bool => ! sandboxAvailable(), 'Skipped: .env.testing not found');
