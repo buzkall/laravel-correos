@@ -2,7 +2,6 @@
 
 namespace SmartDato\CorreosShipping\Resources;
 
-use Saloon\Http\Response;
 use SmartDato\CorreosShipping\Connectors\PreregisterConnector;
 use SmartDato\CorreosShipping\Data\Preregister\AnnulmentExpeditionRequestData;
 use SmartDato\CorreosShipping\Data\Preregister\AnnulmentRequestData;
@@ -37,96 +36,90 @@ use SmartDato\CorreosShipping\Requests\Preregister\QueryShipmentsRequest;
 use SmartDato\CorreosShipping\Requests\Preregister\SearchLabelsInfoRequest;
 use SmartDato\CorreosShipping\Requests\Preregister\ValidateShipmentsRequest;
 
-class PreregisterResource
+class PreregisterResource extends CorreosResource
 {
-    protected ?Response $lastResponse = null;
-
-    public function __construct(
-        protected PreregisterConnector $connector,
-    ) {}
-
-    public function lastResponse(): ?Response
+    public function __construct(PreregisterConnector $connector)
     {
-        return $this->lastResponse;
+        parent::__construct($connector);
     }
 
     public function validateShipments(DeliveryRequestData $data): DeliveryResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new ValidateShipmentsRequest($data)))->throw()->dto();
+        return $this->send(new ValidateShipmentsRequest($data));
     }
 
     public function createShipments(DeliveryRequestData $data): DeliveryResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new CreateShipmentsRequest($data)))->throw()->dto();
+        return $this->send(new CreateShipmentsRequest($data));
     }
 
     public function createCnShipments(DeliveryRequestData $data): CnDeliveryResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new CreateCnShipmentsRequest($data)))->throw()->dto();
+        return $this->send(new CreateCnShipmentsRequest($data));
     }
 
     public function queryShipments(QueryRequestData $data): QueryResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new QueryShipmentsRequest($data)))->throw()->dto();
+        return $this->send(new QueryShipmentsRequest($data));
     }
 
     public function queryShipmentsIris(QueryRequestData $data): QueryResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new QueryShipmentsIrisRequest($data)))->throw()->dto();
+        return $this->send(new QueryShipmentsIrisRequest($data));
     }
 
     public function modifyShipment(DeliveryRequestData $data): ModifyResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new ModifyShipmentRequest($data)))->throw()->dto();
+        return $this->send(new ModifyShipmentRequest($data));
     }
 
     public function cancelShipment(AnnulmentRequestData $data): AnnulmentResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new CancelShipmentRequest($data)))->throw()->dto();
+        return $this->send(new CancelShipmentRequest($data));
     }
 
     public function cancelExpedition(AnnulmentExpeditionRequestData $data): AnnulmentResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new CancelExpeditionRequest($data)))->throw()->dto();
+        return $this->send(new CancelExpeditionRequest($data));
     }
 
     public function generateShipmentCode(GenerateShipmentCodeRequestData $data): GenerateExpeditionResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new GenerateShipmentCodeRequest($data)))->throw()->dto();
+        return $this->send(new GenerateShipmentCodeRequest($data));
     }
 
     public function getExpeditionPackages(string $expeditionCode): PackageExpeditionResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new GetExpeditionPackagesRequest($expeditionCode)))->throw()->dto();
+        return $this->send(new GetExpeditionPackagesRequest($expeditionCode));
     }
 
     public function getPackagesByReference(string $clientReference, ?string $contractNumber = null, ?string $clientNumber = null): PackageReferenceResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new GetPackagesByReferenceRequest($clientReference, $contractNumber, $clientNumber)))->throw()->dto();
+        return $this->send(new GetPackagesByReferenceRequest($clientReference, $contractNumber, $clientNumber));
     }
 
     public function searchLabelsInfo(SearchLabelsInfoRequestData $data): LabelsInfoResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new SearchLabelsInfoRequest($data)))->throw()->dto();
+        return $this->send(new SearchLabelsInfoRequest($data));
     }
 
     public function getBackofficeShipment(string $shipmentCode): BackofficeResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new GetBackofficeShipmentRequest($shipmentCode)))->throw()->dto();
+        return $this->send(new GetBackofficeShipmentRequest($shipmentCode));
     }
 
     public function getBackofficeErrors(?string $contractNumber = null, ?string $clientNumber = null, ?string $dateFrom = null, ?string $dateTo = null): BackofficeResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new GetBackofficeErrorsRequest($contractNumber, $clientNumber, $dateFrom, $dateTo)))->throw()->dto();
+        return $this->send(new GetBackofficeErrorsRequest($contractNumber, $clientNumber, $dateFrom, $dateTo));
     }
 
     public function getBackofficeTotal(?string $contractNumber = null, ?string $clientNumber = null, ?string $dateFrom = null, ?string $dateTo = null): BackofficeResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new GetBackofficeTotalRequest($contractNumber, $clientNumber, $dateFrom, $dateTo)))->throw()->dto();
+        return $this->send(new GetBackofficeTotalRequest($contractNumber, $clientNumber, $dateFrom, $dateTo));
     }
 
     public function getBackofficeWaiting(?string $contractNumber = null, ?string $clientNumber = null, ?string $dateFrom = null, ?string $dateTo = null): BackofficeResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new GetBackofficeWaitingRequest($contractNumber, $clientNumber, $dateFrom, $dateTo)))->throw()->dto();
+        return $this->send(new GetBackofficeWaitingRequest($contractNumber, $clientNumber, $dateFrom, $dateTo));
     }
 }
