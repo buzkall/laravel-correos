@@ -22,8 +22,11 @@ function errorException(array|string $body, int $status = 400): CorreosApiExcept
 {
     config()->set('correos-shipping-sdk.base_urls.labels', 'https://api1.correos.es/support/labels/api/v1');
 
+    // Retries are disabled so the failed response is returned rather than
+    // thrown: this helper is about how an error body maps onto the exception.
     $connector = new LabelsConnector(
-        new CorreosAuthenticator('id', 'secret', 'https://example.com/token', 'AP3', 'gw-id', 'gw-secret')
+        new CorreosAuthenticator('id', 'secret', 'https://example.com/token', 'AP3', 'gw-id', 'gw-secret'),
+        tries: 1,
     );
     $connector->withMockClient(new MockClient([
         PrintLabelsRequest::class => MockResponse::make($body, $status),

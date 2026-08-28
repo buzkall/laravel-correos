@@ -38,6 +38,10 @@ class CorreosShippingServiceProvider extends PackageServiceProvider
                 $app->make(CorreosAuthenticator::class),
                 verifySsl: (bool) config('correos-shipping-sdk.verify_ssl', true),
                 forceIpResolve: config('correos-shipping-sdk.force_ip_resolve'),
+                tries: (int) config('correos-shipping-sdk.retry.times', 3),
+                retryInterval: (int) config('correos-shipping-sdk.retry.interval', 500),
+                useExponentialBackoff: (bool) config('correos-shipping-sdk.retry.exponential_backoff', true),
+                userAgent: config('correos-shipping-sdk.user_agent'),
             );
         });
 
@@ -46,6 +50,10 @@ class CorreosShippingServiceProvider extends PackageServiceProvider
                 $app->make(CorreosAuthenticator::class),
                 verifySsl: (bool) config('correos-shipping-sdk.verify_ssl', true),
                 forceIpResolve: config('correos-shipping-sdk.force_ip_resolve'),
+                tries: (int) config('correos-shipping-sdk.retry.times', 3),
+                retryInterval: (int) config('correos-shipping-sdk.retry.interval', 500),
+                useExponentialBackoff: (bool) config('correos-shipping-sdk.retry.exponential_backoff', true),
+                userAgent: config('correos-shipping-sdk.user_agent'),
             );
         });
 
@@ -54,6 +62,10 @@ class CorreosShippingServiceProvider extends PackageServiceProvider
                 $app->make(CorreosAuthenticator::class),
                 verifySsl: (bool) config('correos-shipping-sdk.verify_ssl', true),
                 forceIpResolve: config('correos-shipping-sdk.force_ip_resolve'),
+                tries: (int) config('correos-shipping-sdk.retry.times', 3),
+                retryInterval: (int) config('correos-shipping-sdk.retry.interval', 500),
+                useExponentialBackoff: (bool) config('correos-shipping-sdk.retry.exponential_backoff', true),
+                userAgent: config('correos-shipping-sdk.user_agent'),
             );
         });
 
