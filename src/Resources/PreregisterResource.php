@@ -52,81 +52,81 @@ class PreregisterResource
 
     public function validateShipments(DeliveryRequestData $data): DeliveryResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new ValidateShipmentsRequest($data)))->dtoOrFail();
+        return ($this->lastResponse = $this->connector->send(new ValidateShipmentsRequest($data)))->throw()->dto();
     }
 
     public function createShipments(DeliveryRequestData $data): DeliveryResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new CreateShipmentsRequest($data)))->dtoOrFail();
+        return ($this->lastResponse = $this->connector->send(new CreateShipmentsRequest($data)))->throw()->dto();
     }
 
     public function createCnShipments(DeliveryRequestData $data): CnDeliveryResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new CreateCnShipmentsRequest($data)))->dtoOrFail();
+        return ($this->lastResponse = $this->connector->send(new CreateCnShipmentsRequest($data)))->throw()->dto();
     }
 
     public function queryShipments(QueryRequestData $data): QueryResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new QueryShipmentsRequest($data)))->dtoOrFail();
+        return ($this->lastResponse = $this->connector->send(new QueryShipmentsRequest($data)))->throw()->dto();
     }
 
     public function queryShipmentsIris(QueryRequestData $data): QueryResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new QueryShipmentsIrisRequest($data)))->dtoOrFail();
+        return ($this->lastResponse = $this->connector->send(new QueryShipmentsIrisRequest($data)))->throw()->dto();
     }
 
     public function modifyShipment(DeliveryRequestData $data): ModifyResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new ModifyShipmentRequest($data)))->dtoOrFail();
+        return ($this->lastResponse = $this->connector->send(new ModifyShipmentRequest($data)))->throw()->dto();
     }
 
     public function cancelShipment(AnnulmentRequestData $data): AnnulmentResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new CancelShipmentRequest($data)))->dtoOrFail();
+        return ($this->lastResponse = $this->connector->send(new CancelShipmentRequest($data)))->throw()->dto();
     }
 
     public function cancelExpedition(AnnulmentExpeditionRequestData $data): AnnulmentResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new CancelExpeditionRequest($data)))->dtoOrFail();
+        return ($this->lastResponse = $this->connector->send(new CancelExpeditionRequest($data)))->throw()->dto();
     }
 
     public function generateShipmentCode(GenerateShipmentCodeRequestData $data): GenerateExpeditionResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new GenerateShipmentCodeRequest($data)))->dtoOrFail();
+        return ($this->lastResponse = $this->connector->send(new GenerateShipmentCodeRequest($data)))->throw()->dto();
     }
 
     public function getExpeditionPackages(string $expeditionCode): PackageExpeditionResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new GetExpeditionPackagesRequest($expeditionCode)))->dtoOrFail();
+        return ($this->lastResponse = $this->connector->send(new GetExpeditionPackagesRequest($expeditionCode)))->throw()->dto();
     }
 
     public function getPackagesByReference(string $clientReference, ?string $contractNumber = null, ?string $clientNumber = null): PackageReferenceResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new GetPackagesByReferenceRequest($clientReference, $contractNumber, $clientNumber)))->dtoOrFail();
+        return ($this->lastResponse = $this->connector->send(new GetPackagesByReferenceRequest($clientReference, $contractNumber, $clientNumber)))->throw()->dto();
     }
 
     public function searchLabelsInfo(SearchLabelsInfoRequestData $data): LabelsInfoResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new SearchLabelsInfoRequest($data)))->dtoOrFail();
+        return ($this->lastResponse = $this->connector->send(new SearchLabelsInfoRequest($data)))->throw()->dto();
     }
 
     public function getBackofficeShipment(string $shipmentCode): BackofficeResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new GetBackofficeShipmentRequest($shipmentCode)))->dtoOrFail();
+        return ($this->lastResponse = $this->connector->send(new GetBackofficeShipmentRequest($shipmentCode)))->throw()->dto();
     }
 
     public function getBackofficeErrors(?string $contractNumber = null, ?string $clientNumber = null, ?string $dateFrom = null, ?string $dateTo = null): BackofficeResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new GetBackofficeErrorsRequest($contractNumber, $clientNumber, $dateFrom, $dateTo)))->dtoOrFail();
+        return ($this->lastResponse = $this->connector->send(new GetBackofficeErrorsRequest($contractNumber, $clientNumber, $dateFrom, $dateTo)))->throw()->dto();
     }
 
     public function getBackofficeTotal(?string $contractNumber = null, ?string $clientNumber = null, ?string $dateFrom = null, ?string $dateTo = null): BackofficeResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new GetBackofficeTotalRequest($contractNumber, $clientNumber, $dateFrom, $dateTo)))->dtoOrFail();
+        return ($this->lastResponse = $this->connector->send(new GetBackofficeTotalRequest($contractNumber, $clientNumber, $dateFrom, $dateTo)))->throw()->dto();
     }
 
     public function getBackofficeWaiting(?string $contractNumber = null, ?string $clientNumber = null, ?string $dateFrom = null, ?string $dateTo = null): BackofficeResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new GetBackofficeWaitingRequest($contractNumber, $clientNumber, $dateFrom, $dateTo)))->dtoOrFail();
+        return ($this->lastResponse = $this->connector->send(new GetBackofficeWaitingRequest($contractNumber, $clientNumber, $dateFrom, $dateTo)))->throw()->dto();
     }
 }

@@ -28,16 +28,16 @@ class LabelsResource
 
     public function printLabels(PrintLabelsRequestData $data): LabelsResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new PrintLabelsRequest($data)))->dtoOrFail();
+        return ($this->lastResponse = $this->connector->send(new PrintLabelsRequest($data)))->throw()->dto();
     }
 
     public function printDocuments(PrintDocumentsRequestData $data): DocumentResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new PrintDocumentsRequest($data)))->dtoOrFail();
+        return ($this->lastResponse = $this->connector->send(new PrintDocumentsRequest($data)))->throw()->dto();
     }
 
     public function getDocumentBackoffice(string $shipment): DocumentBackofficeResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new GetDocumentBackofficeRequest($shipment)))->dtoOrFail();
+        return ($this->lastResponse = $this->connector->send(new GetDocumentBackofficeRequest($shipment)))->throw()->dto();
     }
 }

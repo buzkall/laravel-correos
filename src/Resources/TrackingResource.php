@@ -24,11 +24,11 @@ class TrackingResource
 
     public function searchShipment(string $shippingCode): ShipmentSearchResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new SearchShipmentRequest($shippingCode)))->dtoOrFail();
+        return ($this->lastResponse = $this->connector->send(new SearchShipmentRequest($shippingCode)))->throw()->dto();
     }
 
     public function getExpedition(string $expeditionCode): ExpeditionResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new GetExpeditionRequest($expeditionCode)))->dtoOrFail();
+        return ($this->lastResponse = $this->connector->send(new GetExpeditionRequest($expeditionCode)))->throw()->dto();
     }
 }

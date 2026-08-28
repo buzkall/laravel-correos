@@ -8,6 +8,7 @@ use SmartDato\CorreosShipping\Connectors\LabelsConnector;
 use SmartDato\CorreosShipping\Data\Labels\PrintLabelsRequestData;
 use SmartDato\CorreosShipping\Exceptions\CorreosApiException;
 use SmartDato\CorreosShipping\Requests\Labels\PrintLabelsRequest;
+use SmartDato\CorreosShipping\Resources\LabelsResource;
 
 beforeEach(function () {
     Cache::put(
@@ -109,4 +110,81 @@ it('falls back to the raw body when the response is not json', function () {
     expect($exception->getMessage())->toBe('<html>Gateway timeout</html>')
         ->and($exception->getCode())->toBe(504)
         ->and($exception->moreInformation)->toBeNull();
+});
+
+it('throws the api exception itself rather than a generic dto failure', function () {
+    Cache::put(
+        (new CorreosAuthenticator('id', 'secret', 'https://example.com/token', 'AP3', 'gw-id', 'gw-secret'))->cacheKey(),
+        'fake-test-token',
+        3600,
+    );
+    config()->set('correos-shipping-sdk.base_urls.labels', 'https://api1.correos.es/support/labels/api/v1');
+
+    $connector = new LabelsConnector(
+        new CorreosAuthenticator('id', 'secret', 'https://example.com/token', 'AP3', 'gw-id', 'gw-secret')
+    );
+    $connector->withMockClient(new MockClient([
+        PrintLabelsRequest::class => MockResponse::make([
+            'message' => 'Debe informar los campos obligatorios',
+            'code' => 'ERR-7',
+            'moreInformation' => ['application is mandatory'],
+        ], 400),
+    ]));
+
+    $resource = new LabelsResource($connector);
+
+    $call = fn () => $resource->printLabels(PrintLabelsRequestData::from([
+        'documentationType' => 1,
+        'application' => 'OLC',
+        'print' => [
+            'shipments' => ['PQXYZ1234567890'],
+            'labelFormat' => 2,
+            'labelPrintMode' => 1,
+        ],
+    ]));
+
+    expect($call)->toThrow(CorreosApiException::class, 'Debe informar los campos obligatorios');
+
+    try {
+        $call();
+    } catch (CorreosApiException $exception) {
+        expect($exception->errorCode)->toBe('ERR-7')
+            ->and($exception->moreInformation)->toBe('application is mandatory');
+    }
+});
+
+it('keeps the failed response reachable so the caller can log it', function () {
+    Cache::put(
+        (new CorreosAuthenticator('id', 'secret', 'https://example.com/token', 'AP3', 'gw-id', 'gw-secret'))->cacheKey(),
+        'fake-test-token',
+        3600,
+    );
+    config()->set('correos-shipping-sdk.base_urls.labels', 'https://api1.correos.es/support/labels/api/v1');
+
+    $connector = new LabelsConnector(
+        new CorreosAuthenticator('id', 'secret', 'https://example.com/token', 'AP3', 'gw-id', 'gw-secret')
+    );
+    $connector->withMockClient(new MockClient([
+        PrintLabelsRequest::class => MockResponse::make(['message' => 'Bad Request'], 400),
+    ]));
+
+    $resource = new LabelsResource($connector);
+
+    try {
+        $resource->printLabels(PrintLabelsRequestData::from([
+            'documentationType' => 1,
+            'application' => 'OLC',
+            'print' => [
+                'shipments' => ['PQXYZ1234567890'],
+                'labelFormat' => 2,
+                'labelPrintMode' => 1,
+            ],
+        ]));
+    } catch (CorreosApiException) {
+        // The caller logs the raw exchange from lastResponse().
+    }
+
+    expect($resource->lastResponse())->not->toBeNull()
+        ->and($resource->lastResponse()->status())->toBe(400)
+        ->and($resource->lastResponse()->body())->toBe('{"message":"Bad Request"}');
 });
