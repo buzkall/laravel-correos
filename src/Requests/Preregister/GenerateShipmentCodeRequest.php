@@ -25,6 +25,9 @@ class GenerateShipmentCodeRequest extends Request implements HasBody
         return '/generate/shipmentcode';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function defaultBody(): array
     {
         return $this->data->toArray();

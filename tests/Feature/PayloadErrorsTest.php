@@ -7,11 +7,14 @@ use SmartDato\CorreosShipping\Auth\CorreosAuthenticator;
 use SmartDato\CorreosShipping\Connectors\LabelsConnector;
 use SmartDato\CorreosShipping\Connectors\PreregisterConnector;
 use SmartDato\CorreosShipping\Connectors\TrackingConnector;
+use SmartDato\CorreosShipping\Data\Labels\LabelsResponseData;
 use SmartDato\CorreosShipping\Data\Labels\PrintLabelsRequestData;
 use SmartDato\CorreosShipping\Data\Preregister\AnnulmentRequestData;
+use SmartDato\CorreosShipping\Data\Preregister\AnnulmentResponseData;
 use SmartDato\CorreosShipping\Data\Preregister\DeliveryRequestData;
-use SmartDato\CorreosShipping\Data\Preregister\DeliveryResponseData;
 use SmartDato\CorreosShipping\Data\Preregister\QueryRequestData;
+use SmartDato\CorreosShipping\Data\Preregister\QueryResponseData;
+use SmartDato\CorreosShipping\Data\Tracking\ShipmentSearchResponseData;
 use SmartDato\CorreosShipping\Exceptions\CorreosApiException;
 use SmartDato\CorreosShipping\Requests\Labels\PrintLabelsRequest;
 use SmartDato\CorreosShipping\Requests\Preregister\CancelShipmentRequest;
@@ -22,9 +25,9 @@ use SmartDato\CorreosShipping\Resources\LabelsResource;
 use SmartDato\CorreosShipping\Resources\PreregisterResource;
 use SmartDato\CorreosShipping\Resources\TrackingResource;
 
-beforeEach(function () {
+beforeEach(function (): void {
     Cache::put(
-        (new CorreosAuthenticator('id', 'secret', 'https://example.com/token', 'AP3', 'gw-id', 'gw-secret'))->cacheKey(),
+        new CorreosAuthenticator('id', 'secret', 'https://example.com/token', 'AP3', 'gw-id', 'gw-secret')->cacheKey(),
         'fake-test-token',
         3600,
     );
@@ -67,10 +70,7 @@ function trackingResourceAnswering(MockClient $mockClient): TrackingResource
 
 function payloadErrorShipmentRequest(): DeliveryRequestData
 {
-    return DeliveryRequestData::from(json_decode(
-        file_get_contents(__DIR__.'/../Fixtures/preregister/delivery_request.json'),
-        true,
-    ));
+    return DeliveryRequestData::from(fixtureJson('preregister/delivery_request.json'));
 }
 
 function printLabelsData(): PrintLabelsRequestData
@@ -85,7 +85,7 @@ function printLabelsData(): PrintLabelsRequestData
     ]);
 }
 
-it('throws when the labels endpoint answers 200 with an error and no pdf', function () {
+it('throws when the labels endpoint answers 200 with an error and no pdf', function (): void {
     $resource = labelsResourceAnswering(new MockClient([
         PrintLabelsRequest::class => MockResponse::make([
             'pdf' => null,
@@ -95,11 +95,11 @@ it('throws when the labels endpoint answers 200 with an error and no pdf', funct
         ], 200),
     ]));
 
-    expect(fn () => $resource->printLabels(printLabelsData()))
+    expect(fn (): LabelsResponseData => $resource->printLabels(printLabelsData()))
         ->toThrow(CorreosApiException::class, 'El envío PQXYZ1234567890 no existe');
 });
 
-it('keeps the 200 error response reachable on the exception and the resource', function () {
+it('keeps the 200 error response reachable on the exception and the resource', function (): void {
     $resource = labelsResourceAnswering(new MockClient([
         PrintLabelsRequest::class => MockResponse::make([
             'pdf' => null,
@@ -120,7 +120,7 @@ it('keeps the 200 error response reachable on the exception and the resource', f
         ->and($resource->lastResponse()->status())->toBe(200);
 });
 
-it('throws when a preregister query answers 200 with an error', function () {
+it('throws when a preregister query answers 200 with an error', function (): void {
     $resource = preregisterResourceAnswering(new MockClient([
         QueryShipmentsRequest::class => MockResponse::make([
             'shipments' => null,
@@ -128,11 +128,11 @@ it('throws when a preregister query answers 200 with an error', function () {
         ], 200),
     ]));
 
-    expect(fn () => $resource->queryShipments(QueryRequestData::from(['shipments' => ['PQXYZ1234567890']])))
+    expect(fn (): QueryResponseData => $resource->queryShipments(QueryRequestData::from(['shipments' => ['PQXYZ1234567890']])))
         ->toThrow(CorreosApiException::class, 'Contrato no autorizado');
 });
 
-it('renders a list of error objects into one message and keeps the first code', function () {
+it('renders a list of error objects into one message and keeps the first code', function (): void {
     $resource = preregisterResourceAnswering(new MockClient([
         CancelShipmentRequest::class => MockResponse::make([
             'message' => null,
@@ -143,7 +143,7 @@ it('renders a list of error objects into one message and keeps the first code', 
         ], 200),
     ]));
 
-    $call = fn () => $resource->cancelShipment(AnnulmentRequestData::from(['packageCode' => 'PQ1DR4A0000012345678']));
+    $call = fn (): AnnulmentResponseData => $resource->cancelShipment(AnnulmentRequestData::from(['packageCode' => 'PQ1DR4A0000012345678']));
 
     expect($call)->toThrow(CorreosApiException::class, '1021: El envío ya está anulado; 1022: Contrato no autorizado');
 
@@ -154,7 +154,7 @@ it('renders a list of error objects into one message and keeps the first code', 
     }
 });
 
-it('throws when tracking answers 200 with an error list', function () {
+it('throws when tracking answers 200 with an error list', function (): void {
     $resource = trackingResourceAnswering(new MockClient([
         SearchShipmentRequest::class => MockResponse::make([
             'shipment' => null,
@@ -164,11 +164,11 @@ it('throws when tracking answers 200 with an error list', function () {
         ], 200),
     ]));
 
-    expect(fn () => $resource->searchShipment('PQ1DR4A0000012345678'))
+    expect(fn (): ShipmentSearchResponseData => $resource->searchShipment('PQ1DR4A0000012345678'))
         ->toThrow(CorreosApiException::class, '1001: Envío no encontrado');
 });
 
-it('leaves per shipment validation errors on the dto', function () {
+it('leaves per shipment validation errors on the dto', function (): void {
     $resource = preregisterResourceAnswering(new MockClient([
         ValidateShipmentsRequest::class => MockResponse::make([
             'fileIdentifier' => 'FILE001',
@@ -189,12 +189,11 @@ it('leaves per shipment validation errors on the dto', function () {
 
     $response = $resource->validateShipments(payloadErrorShipmentRequest());
 
-    expect($response)->toBeInstanceOf(DeliveryResponseData::class)
-        ->and($response->shipments[0]->validationErrorCount)->toBe(1)
+    expect($response->shipments[0]->validationErrorCount)->toBe(1)
         ->and($response->shipments[0]->error[0]->description)->toBe('CP no válido');
 });
 
-it('does not throw when the error field is empty', function () {
+it('does not throw when the error field is empty', function (): void {
     $resource = labelsResourceAnswering(new MockClient([
         PrintLabelsRequest::class => MockResponse::make([
             'pdf' => 'JVBERi0xLjQ=',

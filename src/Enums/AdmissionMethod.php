@@ -3,8 +3,9 @@
 namespace SmartDato\CorreosShipping\Enums;
 
 use SmartDato\CorreosShipping\Enums\Concerns\HasOptions;
+use SmartDato\CorreosShipping\Enums\Contracts\Optionable;
 
-enum AdmissionMethod: int
+enum AdmissionMethod: int implements Optionable
 {
     use HasOptions;
 

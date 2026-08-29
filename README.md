@@ -511,9 +511,11 @@ synthesizers — they ship disabled:
 ## Testing
 
 ```bash
-composer test             # Run tests
-composer analyse          # Static analysis (PHPStan level 5)
+composer test             # Run tests (Pest 5)
+composer analyse          # Static analysis of src, config and tests (PHPStan level 7)
 composer format           # Code style (Laravel Pint)
+composer rector-dry       # Preview automated refactors (Rector)
+composer rector           # Apply automated refactors (Rector)
 composer test-coverage    # Tests with coverage report
 ```
 

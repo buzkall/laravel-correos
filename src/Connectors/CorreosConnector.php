@@ -12,6 +12,7 @@ use Saloon\Http\Request;
 use Saloon\Http\Response;
 use SmartDato\CorreosShipping\Auth\CorreosAuthenticator;
 use SmartDato\CorreosShipping\Exceptions\CorreosApiException;
+use Throwable;
 
 abstract class CorreosConnector extends Connector
 {
@@ -74,7 +75,7 @@ abstract class CorreosConnector extends Connector
         return $this->correosAuthenticator;
     }
 
-    public function getRequestException(Response $response, ?\Throwable $senderException): ?\Throwable
+    public function getRequestException(Response $response, ?Throwable $senderException): ?Throwable
     {
         return CorreosApiException::fromResponse($response);
     }

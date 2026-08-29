@@ -3,6 +3,7 @@
 namespace SmartDato\CorreosShipping\Enums;
 
 use SmartDato\CorreosShipping\Enums\Concerns\HasOptions;
+use SmartDato\CorreosShipping\Enums\Contracts\Optionable;
 
 /**
  * MDP product codes (Annex I - Products table).
@@ -11,7 +12,7 @@ use SmartDato\CorreosShipping\Enums\Concerns\HasOptions;
  * depending on your contract. Use the string value directly if
  * your product code is not listed here.
  */
-enum ProductCode: string
+enum ProductCode: string implements Optionable
 {
     use HasOptions;
 

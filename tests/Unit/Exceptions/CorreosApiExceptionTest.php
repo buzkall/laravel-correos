@@ -5,19 +5,23 @@ use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
 use SmartDato\CorreosShipping\Auth\CorreosAuthenticator;
 use SmartDato\CorreosShipping\Connectors\LabelsConnector;
+use SmartDato\CorreosShipping\Data\Labels\LabelsResponseData;
 use SmartDato\CorreosShipping\Data\Labels\PrintLabelsRequestData;
 use SmartDato\CorreosShipping\Exceptions\CorreosApiException;
 use SmartDato\CorreosShipping\Requests\Labels\PrintLabelsRequest;
 use SmartDato\CorreosShipping\Resources\LabelsResource;
 
-beforeEach(function () {
+beforeEach(function (): void {
     Cache::put(
-        (new CorreosAuthenticator('id', 'secret', 'https://example.com/token', 'AP3', 'gw-id', 'gw-secret'))->cacheKey(),
+        new CorreosAuthenticator('id', 'secret', 'https://example.com/token', 'AP3', 'gw-id', 'gw-secret')->cacheKey(),
         'fake-test-token',
         3600,
     );
 });
 
+/**
+ * @param  array<string, mixed>|string  $body
+ */
 function errorException(array|string $body, int $status = 400): CorreosApiException
 {
     config()->set('correos-shipping-sdk.base_urls.labels', 'https://api1.correos.es/support/labels/api/v1');
@@ -42,24 +46,29 @@ function errorException(array|string $body, int $status = 400): CorreosApiExcept
         ],
     ])));
 
-    return $response->toException();
+    $exception = $response->toException();
+
+    if (! $exception instanceof CorreosApiException) {
+        throw new RuntimeException('The connector did not build a CorreosApiException for the failed response.');
+    }
+
+    return $exception;
 }
 
-it('keeps string error fields as they are', function () {
+it('keeps string error fields as they are', function (): void {
     $exception = errorException([
         'message' => 'Bad Request',
         'code' => 'ERR-42',
         'moreInformation' => 'The shipment code is unknown',
     ]);
 
-    expect($exception)->toBeInstanceOf(CorreosApiException::class)
-        ->and($exception->getMessage())->toBe('Bad Request')
+    expect($exception->getMessage())->toBe('Bad Request')
         ->and($exception->getCode())->toBe(400)
         ->and($exception->errorCode)->toBe('ERR-42')
         ->and($exception->moreInformation)->toBe('The shipment code is unknown');
 });
 
-it('joins a list of error details into one string', function () {
+it('joins a list of error details into one string', function (): void {
     $exception = errorException([
         'message' => 'Debe informar los campos obligatorios',
         'moreInformation' => ['application is mandatory', 'print is mandatory'],
@@ -68,7 +77,7 @@ it('joins a list of error details into one string', function () {
     expect($exception->moreInformation)->toBe('application is mandatory; print is mandatory');
 });
 
-it('encodes structured error details as json', function () {
+it('encodes structured error details as json', function (): void {
     $exception = errorException([
         'message' => 'Validation failed',
         'moreInformation' => [
@@ -79,7 +88,7 @@ it('encodes structured error details as json', function () {
     expect($exception->moreInformation)->toBe('[{"field":"application","description":"mandatory"}]');
 });
 
-it('renders an error message that is not a string', function () {
+it('renders an error message that is not a string', function (): void {
     $exception = errorException([
         'message' => ['first problem', 'second problem'],
     ]);
@@ -87,7 +96,7 @@ it('renders an error message that is not a string', function () {
     expect($exception->getMessage())->toBe('first problem; second problem');
 });
 
-it('casts a numeric error code to a string', function () {
+it('casts a numeric error code to a string', function (): void {
     $exception = errorException([
         'message' => 'Validation failed',
         'code' => 1234,
@@ -96,7 +105,7 @@ it('casts a numeric error code to a string', function () {
     expect($exception->errorCode)->toBe('1234');
 });
 
-it('treats empty error details as absent', function () {
+it('treats empty error details as absent', function (): void {
     $exception = errorException([
         'message' => 'Validation failed',
         'code' => '',
@@ -107,7 +116,7 @@ it('treats empty error details as absent', function () {
         ->and($exception->moreInformation)->toBeNull();
 });
 
-it('falls back to the raw body when the response is not json', function () {
+it('falls back to the raw body when the response is not json', function (): void {
     $exception = errorException('<html>Gateway timeout</html>', 504);
 
     expect($exception->getMessage())->toBe('<html>Gateway timeout</html>')
@@ -115,9 +124,9 @@ it('falls back to the raw body when the response is not json', function () {
         ->and($exception->moreInformation)->toBeNull();
 });
 
-it('throws the api exception itself rather than a generic dto failure', function () {
+it('throws the api exception itself rather than a generic dto failure', function (): void {
     Cache::put(
-        (new CorreosAuthenticator('id', 'secret', 'https://example.com/token', 'AP3', 'gw-id', 'gw-secret'))->cacheKey(),
+        new CorreosAuthenticator('id', 'secret', 'https://example.com/token', 'AP3', 'gw-id', 'gw-secret')->cacheKey(),
         'fake-test-token',
         3600,
     );
@@ -136,7 +145,7 @@ it('throws the api exception itself rather than a generic dto failure', function
 
     $resource = new LabelsResource($connector);
 
-    $call = fn () => $resource->printLabels(PrintLabelsRequestData::from([
+    $call = fn (): LabelsResponseData => $resource->printLabels(PrintLabelsRequestData::from([
         'documentationType' => 1,
         'application' => 'OLC',
         'print' => [
@@ -156,9 +165,9 @@ it('throws the api exception itself rather than a generic dto failure', function
     }
 });
 
-it('keeps the failed response reachable so the caller can log it', function () {
+it('keeps the failed response reachable so the caller can log it', function (): void {
     Cache::put(
-        (new CorreosAuthenticator('id', 'secret', 'https://example.com/token', 'AP3', 'gw-id', 'gw-secret'))->cacheKey(),
+        new CorreosAuthenticator('id', 'secret', 'https://example.com/token', 'AP3', 'gw-id', 'gw-secret')->cacheKey(),
         'fake-test-token',
         3600,
     );

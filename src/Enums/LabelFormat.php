@@ -3,8 +3,9 @@
 namespace SmartDato\CorreosShipping\Enums;
 
 use SmartDato\CorreosShipping\Enums\Concerns\HasOptions;
+use SmartDato\CorreosShipping\Enums\Contracts\Optionable;
 
-enum LabelFormat: int
+enum LabelFormat: int implements Optionable
 {
     use HasOptions;
 

@@ -2,9 +2,11 @@
 
 namespace SmartDato\CorreosShipping\Exceptions;
 
+use JsonException;
 use Saloon\Exceptions\Request\RequestException;
 use Saloon\Http\Response;
 use Spatie\LaravelData\Optional;
+use Throwable;
 
 /**
  * Extends Saloon's RequestException so the connector retry policy can inspect
@@ -19,7 +21,7 @@ class CorreosApiException extends RequestException
         int $code = 0,
         public readonly ?string $errorCode = null,
         public readonly ?string $moreInformation = null,
-        ?\Throwable $previous = null,
+        ?Throwable $previous = null,
     ) {
         parent::__construct($response, $message, $code, $previous);
     }
@@ -29,7 +31,7 @@ class CorreosApiException extends RequestException
         try {
             /** @var mixed $data Saloon annotates json() as an array, but a scalar body decodes to a scalar. */
             $data = $response->json();
-        } catch (\JsonException) {
+        } catch (JsonException) {
             $data = [];
         }
 
@@ -69,10 +71,9 @@ class CorreosApiException extends RequestException
                 continue;
             }
 
-            /** @var mixed $error */
             $error = get_object_vars($dto)[$property] ?? null;
 
-            if ($error === null || $error === '' || $error === [] || $error instanceof Optional) {
+            if (in_array($error, [null, '', []], true) || $error instanceof Optional) {
                 continue;
             }
 
@@ -108,7 +109,7 @@ class CorreosApiException extends RequestException
 
     private static function describeErrorEntry(mixed $entry): ?string
     {
-        if ($entry === null || $entry === '' || $entry === []) {
+        if (in_array($entry, [null, '', []], true)) {
             return null;
         }
 
@@ -167,7 +168,7 @@ class CorreosApiException extends RequestException
      */
     private static function flatten(mixed $value): ?string
     {
-        if ($value === null || $value === '' || $value === []) {
+        if (in_array($value, [null, '', []], true)) {
             return null;
         }
 
@@ -179,7 +180,7 @@ class CorreosApiException extends RequestException
             return (string) $value;
         }
 
-        if (is_array($value) && count(array_filter($value, 'is_scalar')) === count($value)) {
+        if (is_array($value) && count(array_filter($value, is_scalar(...))) === count($value)) {
             return implode('; ', array_map(strval(...), $value));
         }
 

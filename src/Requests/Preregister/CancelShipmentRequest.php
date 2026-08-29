@@ -25,6 +25,9 @@ class CancelShipmentRequest extends Request implements HasBody
         return '/delivery/annulment';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function defaultBody(): array
     {
         return $this->data->toArray();
