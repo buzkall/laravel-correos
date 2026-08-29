@@ -20,49 +20,39 @@ class CorreosShippingServiceProvider extends PackageServiceProvider
 
     public function packageRegistered(): void
     {
-        $this->app->singleton(CorreosAuthenticator::class, function () {
-            return new CorreosAuthenticator(
-                oauthClientId: (string) config('correos-shipping-sdk.oauth.client_id'),
-                oauthClientSecret: (string) config('correos-shipping-sdk.oauth.client_secret'),
-                tokenUrl: (string) config('correos-shipping-sdk.oauth.token_url'),
-                scope: (string) config('correos-shipping-sdk.oauth.scope'),
-                gatewayClientId: (string) config('correos-shipping-sdk.gateway.client_id'),
-                gatewayClientSecret: (string) config('correos-shipping-sdk.gateway.client_secret'),
-                verifySsl: (bool) config('correos-shipping-sdk.verify_ssl', true),
-                forceIpResolve: config('correos-shipping-sdk.force_ip_resolve'),
-            );
-        });
+        $this->app->singleton(CorreosAuthenticator::class, fn (): CorreosAuthenticator => new CorreosAuthenticator(
+            oauthClientId: (string) config('correos-shipping-sdk.oauth.client_id'),
+            oauthClientSecret: (string) config('correos-shipping-sdk.oauth.client_secret'),
+            tokenUrl: (string) config('correos-shipping-sdk.oauth.token_url'),
+            scope: (string) config('correos-shipping-sdk.oauth.scope'),
+            gatewayClientId: (string) config('correos-shipping-sdk.gateway.client_id'),
+            gatewayClientSecret: (string) config('correos-shipping-sdk.gateway.client_secret'),
+            verifySsl: (bool) config('correos-shipping-sdk.verify_ssl', true),
+            forceIpResolve: config('correos-shipping-sdk.force_ip_resolve'),
+        ));
 
-        $this->app->singleton(PreregisterConnector::class, function ($app) {
-            return new PreregisterConnector(
-                $app->make(CorreosAuthenticator::class),
-                verifySsl: (bool) config('correos-shipping-sdk.verify_ssl', true),
-                forceIpResolve: config('correos-shipping-sdk.force_ip_resolve'),
-            );
-        });
+        $this->app->singleton(PreregisterConnector::class, fn ($app): PreregisterConnector => new PreregisterConnector(
+            $app->make(CorreosAuthenticator::class),
+            verifySsl: (bool) config('correos-shipping-sdk.verify_ssl', true),
+            forceIpResolve: config('correos-shipping-sdk.force_ip_resolve'),
+        ));
 
-        $this->app->singleton(LabelsConnector::class, function ($app) {
-            return new LabelsConnector(
-                $app->make(CorreosAuthenticator::class),
-                verifySsl: (bool) config('correos-shipping-sdk.verify_ssl', true),
-                forceIpResolve: config('correos-shipping-sdk.force_ip_resolve'),
-            );
-        });
+        $this->app->singleton(LabelsConnector::class, fn ($app): LabelsConnector => new LabelsConnector(
+            $app->make(CorreosAuthenticator::class),
+            verifySsl: (bool) config('correos-shipping-sdk.verify_ssl', true),
+            forceIpResolve: config('correos-shipping-sdk.force_ip_resolve'),
+        ));
 
-        $this->app->singleton(TrackingConnector::class, function ($app) {
-            return new TrackingConnector(
-                $app->make(CorreosAuthenticator::class),
-                verifySsl: (bool) config('correos-shipping-sdk.verify_ssl', true),
-                forceIpResolve: config('correos-shipping-sdk.force_ip_resolve'),
-            );
-        });
+        $this->app->singleton(TrackingConnector::class, fn ($app): TrackingConnector => new TrackingConnector(
+            $app->make(CorreosAuthenticator::class),
+            verifySsl: (bool) config('correos-shipping-sdk.verify_ssl', true),
+            forceIpResolve: config('correos-shipping-sdk.force_ip_resolve'),
+        ));
 
-        $this->app->singleton(CorreosShipping::class, function ($app) {
-            return new CorreosShipping(
-                $app->make(PreregisterConnector::class),
-                $app->make(LabelsConnector::class),
-                $app->make(TrackingConnector::class),
-            );
-        });
+        $this->app->singleton(CorreosShipping::class, fn ($app): CorreosShipping => new CorreosShipping(
+            $app->make(PreregisterConnector::class),
+            $app->make(LabelsConnector::class),
+            $app->make(TrackingConnector::class),
+        ));
     }
 }

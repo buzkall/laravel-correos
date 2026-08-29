@@ -25,6 +25,9 @@ class QueryShipmentsIrisRequest extends Request implements HasBody
         return '/delivery/package/iris';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function defaultBody(): array
     {
         return $this->data->toArray();

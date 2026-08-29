@@ -25,6 +25,9 @@ class PrintLabelsRequest extends Request implements HasBody
         return '/labels/print';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function defaultBody(): array
     {
         return $this->data->toArray();

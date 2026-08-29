@@ -1,10 +1,9 @@
 <?php
 
 use SmartDato\CorreosShipping\Data\Labels\LabelsResponseData;
-use SmartDato\CorreosShipping\Data\Labels\PrintData;
 use SmartDato\CorreosShipping\Data\Labels\PrintLabelsRequestData;
 
-it('creates print labels request data', function () {
+it('creates print labels request data', function (): void {
     $data = PrintLabelsRequestData::from([
         'documentationType' => 1,
         'print' => [
@@ -15,13 +14,12 @@ it('creates print labels request data', function () {
     ]);
 
     expect($data->documentationType)->toBe(1)
-        ->and($data->print)->toBeInstanceOf(PrintData::class)
         ->and($data->print->shipments)->toBe(['PQXYZ1234567890'])
         ->and($data->print->labelFormat)->toBe(2)
         ->and($data->print->labelPrintMode)->toBe(1);
 });
 
-it('serializes print labels request data without optional fields', function () {
+it('serializes print labels request data without optional fields', function (): void {
     $data = PrintLabelsRequestData::from([
         'documentationType' => 0,
         'print' => [
@@ -35,16 +33,13 @@ it('serializes print labels request data without optional fields', function () {
 
     expect($array)->toHaveKey('documentationType', 0)
         ->toHaveKey('print')
-        ->not->toHaveKey('application');
-
-    expect($array['print'])->toHaveKey('shipments', ['CODE1', 'CODE2'])
-        ->toHaveKey('labelFormat', 2)
-        ->not->toHaveKey('clientLogo');
+        ->not->toHaveKey('application')
+        ->and($array['print'])->toHaveKey('shipments', ['CODE1', 'CODE2'])
+        ->toHaveKey('labelFormat', 2)->not->toHaveKey('clientLogo');
 });
 
-it('deserializes labels response data', function () {
-    $json = file_get_contents(__DIR__.'/../../../Fixtures/labels/labels_response.json');
-    $data = LabelsResponseData::from(json_decode($json, true));
+it('deserializes labels response data', function (): void {
+    $data = LabelsResponseData::from(fixtureJson('labels/labels_response.json'));
 
     expect($data->pdf)->toBe('JVBERi0xLjQgZmFrZSBwZGYgY29udGVudA==')
         ->and($data->zpl)->toBeNull()

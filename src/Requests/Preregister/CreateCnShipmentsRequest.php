@@ -25,6 +25,9 @@ class CreateCnShipmentsRequest extends Request implements HasBody
         return '/delivery/cn';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function defaultBody(): array
     {
         return $this->data->toArray();

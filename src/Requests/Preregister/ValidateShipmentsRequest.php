@@ -25,6 +25,9 @@ class ValidateShipmentsRequest extends Request implements HasBody
         return '/delivery/validate';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function defaultBody(): array
     {
         return $this->data->toArray();

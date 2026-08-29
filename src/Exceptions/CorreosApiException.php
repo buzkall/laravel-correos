@@ -3,7 +3,9 @@
 namespace SmartDato\CorreosShipping\Exceptions;
 
 use Exception;
+use JsonException;
 use Saloon\Http\Response;
+use Throwable;
 
 class CorreosApiException extends Exception
 {
@@ -12,7 +14,7 @@ class CorreosApiException extends Exception
         int $code = 0,
         public readonly ?string $errorCode = null,
         public readonly ?string $moreInformation = null,
-        ?\Throwable $previous = null,
+        ?Throwable $previous = null,
     ) {
         parent::__construct($message, $code, $previous);
     }
@@ -22,7 +24,7 @@ class CorreosApiException extends Exception
         try {
             /** @var mixed $data Saloon annotates json() as an array, but a scalar body decodes to a scalar. */
             $data = $response->json();
-        } catch (\JsonException) {
+        } catch (JsonException) {
             $data = [];
         }
 
@@ -45,7 +47,7 @@ class CorreosApiException extends Exception
      */
     private static function flatten(mixed $value): ?string
     {
-        if ($value === null || $value === '' || $value === []) {
+        if (in_array($value, [null, '', []], true)) {
             return null;
         }
 
@@ -57,7 +59,7 @@ class CorreosApiException extends Exception
             return (string) $value;
         }
 
-        if (is_array($value) && count(array_filter($value, 'is_scalar')) === count($value)) {
+        if (is_array($value) && count(array_filter($value, is_scalar(...))) === count($value)) {
             return implode('; ', array_map(strval(...), $value));
         }
 
