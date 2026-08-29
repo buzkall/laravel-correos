@@ -2,33 +2,26 @@
 
 namespace SmartDato\CorreosShipping\Resources;
 
-use Saloon\Http\Response;
 use SmartDato\CorreosShipping\Connectors\TrackingConnector;
 use SmartDato\CorreosShipping\Data\Tracking\ExpeditionResponseData;
 use SmartDato\CorreosShipping\Data\Tracking\ShipmentSearchResponseData;
 use SmartDato\CorreosShipping\Requests\Tracking\GetExpeditionRequest;
 use SmartDato\CorreosShipping\Requests\Tracking\SearchShipmentRequest;
 
-class TrackingResource
+class TrackingResource extends CorreosResource
 {
-    protected ?Response $lastResponse = null;
-
-    public function __construct(
-        protected TrackingConnector $connector,
-    ) {}
-
-    public function lastResponse(): ?Response
+    public function __construct(TrackingConnector $connector)
     {
-        return $this->lastResponse;
+        parent::__construct($connector);
     }
 
     public function searchShipment(string $shippingCode): ShipmentSearchResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new SearchShipmentRequest($shippingCode)))->throw()->dto();
+        return $this->send(new SearchShipmentRequest($shippingCode));
     }
 
     public function getExpedition(string $expeditionCode): ExpeditionResponseData
     {
-        return ($this->lastResponse = $this->connector->send(new GetExpeditionRequest($expeditionCode)))->throw()->dto();
+        return $this->send(new GetExpeditionRequest($expeditionCode));
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use SmartDato\CorreosShipping\Data\Labels\DocumentResponseData;
 use SmartDato\CorreosShipping\Data\Labels\LabelsResponseData;
 use SmartDato\CorreosShipping\Data\Labels\PrintLabelsRequestData;
 
@@ -45,4 +46,36 @@ it('deserializes labels response data', function (): void {
         ->and($data->zpl)->toBeNull()
         ->and($data->xml)->toBeNull()
         ->and($data->error)->toBeNull();
+});
+
+it('decodes the base64 pdf into raw bytes', function (): void {
+    $data = LabelsResponseData::from([
+        'pdf' => base64_encode('%PDF-1.4 fake pdf content'),
+        'zpl' => null,
+        'xml' => null,
+        'error' => null,
+    ]);
+
+    expect($data->decodedPdf())->toBe('%PDF-1.4 fake pdf content');
+});
+
+it('decodes the base64 pdf of a customs document', function (): void {
+    $data = DocumentResponseData::from([
+        'pdf' => base64_encode('%PDF-1.4 fake document'),
+        'error' => null,
+    ]);
+
+    expect($data->decodedPdf())->toBe('%PDF-1.4 fake document');
+});
+
+it('has no decoded pdf when the response carries none', function (): void {
+    $data = LabelsResponseData::from(['pdf' => null, 'zpl' => 'ZPL', 'xml' => null, 'error' => null]);
+
+    expect($data->decodedPdf())->toBeNull();
+});
+
+it('has no decoded pdf when the payload is not base64', function (): void {
+    $data = LabelsResponseData::from(['pdf' => 'not base64 !!', 'zpl' => null, 'xml' => null, 'error' => null]);
+
+    expect($data->decodedPdf())->toBeNull();
 });

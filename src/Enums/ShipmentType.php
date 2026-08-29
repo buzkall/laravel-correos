@@ -2,8 +2,13 @@
 
 namespace SmartDato\CorreosShipping\Enums;
 
-enum ShipmentType: string
+use SmartDato\CorreosShipping\Enums\Concerns\HasOptions;
+use SmartDato\CorreosShipping\Enums\Contracts\Optionable;
+
+enum ShipmentType: string implements Optionable
 {
+    use HasOptions;
+
     case Documents = '1';
     case Goods = '2';
     case Gift = '3';
@@ -11,4 +16,17 @@ enum ShipmentType: string
     case Returns = '5';
     case Other = '6';
     case Dangerous = '7';
+
+    public function label(): string
+    {
+        return match ($this) {
+            self::Documents => 'Documents',
+            self::Goods => 'Goods',
+            self::Gift => 'Gift',
+            self::Samples => 'Commercial samples',
+            self::Returns => 'Returned goods',
+            self::Other => 'Other',
+            self::Dangerous => 'Dangerous goods',
+        };
+    }
 }

@@ -18,6 +18,15 @@ class CorreosShippingServiceProvider extends PackageServiceProvider
             ->hasConfigFile();
     }
 
+    /**
+     * Timeouts are optional: an unset config key leaves Saloon's default in
+     * place rather than sending a zero.
+     */
+    protected function optionalInt(mixed $value): ?int
+    {
+        return is_numeric($value) ? (int) $value : null;
+    }
+
     public function packageRegistered(): void
     {
         $this->app->singleton(CorreosAuthenticator::class, fn (): CorreosAuthenticator => new CorreosAuthenticator(
@@ -35,18 +44,36 @@ class CorreosShippingServiceProvider extends PackageServiceProvider
             $app->make(CorreosAuthenticator::class),
             verifySsl: (bool) config('correos-shipping-sdk.verify_ssl', true),
             forceIpResolve: config('correos-shipping-sdk.force_ip_resolve'),
+            tries: (int) config('correos-shipping-sdk.retry.times', 3),
+            retryInterval: (int) config('correos-shipping-sdk.retry.interval', 500),
+            useExponentialBackoff: (bool) config('correos-shipping-sdk.retry.exponential_backoff', true),
+            userAgent: config('correos-shipping-sdk.user_agent'),
+            timeout: $this->optionalInt(config('correos-shipping-sdk.timeout')),
+            connectTimeout: $this->optionalInt(config('correos-shipping-sdk.connect_timeout')),
         ));
 
         $this->app->singleton(LabelsConnector::class, fn ($app): LabelsConnector => new LabelsConnector(
             $app->make(CorreosAuthenticator::class),
             verifySsl: (bool) config('correos-shipping-sdk.verify_ssl', true),
             forceIpResolve: config('correos-shipping-sdk.force_ip_resolve'),
+            tries: (int) config('correos-shipping-sdk.retry.times', 3),
+            retryInterval: (int) config('correos-shipping-sdk.retry.interval', 500),
+            useExponentialBackoff: (bool) config('correos-shipping-sdk.retry.exponential_backoff', true),
+            userAgent: config('correos-shipping-sdk.user_agent'),
+            timeout: $this->optionalInt(config('correos-shipping-sdk.timeout')),
+            connectTimeout: $this->optionalInt(config('correos-shipping-sdk.connect_timeout')),
         ));
 
         $this->app->singleton(TrackingConnector::class, fn ($app): TrackingConnector => new TrackingConnector(
             $app->make(CorreosAuthenticator::class),
             verifySsl: (bool) config('correos-shipping-sdk.verify_ssl', true),
             forceIpResolve: config('correos-shipping-sdk.force_ip_resolve'),
+            tries: (int) config('correos-shipping-sdk.retry.times', 3),
+            retryInterval: (int) config('correos-shipping-sdk.retry.interval', 500),
+            useExponentialBackoff: (bool) config('correos-shipping-sdk.retry.exponential_backoff', true),
+            userAgent: config('correos-shipping-sdk.user_agent'),
+            timeout: $this->optionalInt(config('correos-shipping-sdk.timeout')),
+            connectTimeout: $this->optionalInt(config('correos-shipping-sdk.connect_timeout')),
         ));
 
         $this->app->singleton(CorreosShipping::class, fn ($app): CorreosShipping => new CorreosShipping(

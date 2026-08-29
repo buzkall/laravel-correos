@@ -65,3 +65,67 @@ it('connectors do not set force_ip_resolve when null', function (): void {
 
     expect($config)->not->toHaveKey('force_ip_resolve');
 });
+
+it('connectors identify the sdk in the user agent', function (): void {
+    $connector = new PreregisterConnector(makeAuthenticator());
+
+    expect($connector->headers()->get('User-Agent'))->toStartWith('SmartDato-CorreosShippingSDK');
+});
+
+it('connectors accept a custom user agent', function (): void {
+    $connector = new PreregisterConnector(makeAuthenticator(), userAgent: 'LaAnonima/2.1');
+
+    expect($connector->headers()->get('User-Agent'))->toBe('LaAnonima/2.1');
+});
+
+it('connectors retry three times with exponential backoff by default', function (): void {
+    $connector = new PreregisterConnector(makeAuthenticator());
+
+    expect($connector->tries)->toBe(3)
+        ->and($connector->retryInterval)->toBe(500)
+        ->and($connector->useExponentialBackoff)->toBeTrue();
+});
+
+it('connectors resolved from the container follow the retry config', function (): void {
+    config()->set('correos-shipping-sdk.retry.times', 5);
+    config()->set('correos-shipping-sdk.retry.interval', 100);
+    config()->set('correos-shipping-sdk.retry.exponential_backoff', false);
+    config()->set('correos-shipping-sdk.user_agent', 'LaAnonima/1.0');
+
+    $connector = resolve(PreregisterConnector::class);
+
+    expect($connector->tries)->toBe(5)
+        ->and($connector->retryInterval)->toBe(100)
+        ->and($connector->useExponentialBackoff)->toBeFalse()
+        ->and($connector->headers()->get('User-Agent'))->toBe('LaAnonima/1.0');
+});
+
+it('connectors leave the timeouts unset so saloon defaults apply', function (): void {
+    $connector = new PreregisterConnector(makeAuthenticator());
+
+    expect($connector->config()->all())->not->toHaveKey('timeout')
+        ->and($connector->config()->all())->not->toHaveKey('connect_timeout');
+});
+
+it('connectors accept timeouts', function (): void {
+    $connector = new PreregisterConnector(makeAuthenticator(), timeout: 8, connectTimeout: 3);
+
+    expect($connector->config()->all())->toHaveKey('timeout', 8)
+        ->toHaveKey('connect_timeout', 3);
+});
+
+it('connectors resolved from the container follow the timeout config', function (): void {
+    config()->set('correos-shipping-sdk.timeout', '8');
+    config()->set('correos-shipping-sdk.connect_timeout', '3');
+
+    $connector = resolve(LabelsConnector::class);
+
+    expect($connector->config()->all())->toHaveKey('timeout', 8)
+        ->toHaveKey('connect_timeout', 3);
+});
+
+it('connectors resolved from the container leave unset timeouts alone', function (): void {
+    $connector = resolve(TrackingConnector::class);
+
+    expect($connector->config()->all())->not->toHaveKey('timeout');
+});
