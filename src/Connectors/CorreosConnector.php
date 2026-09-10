@@ -96,6 +96,15 @@ abstract class CorreosConnector extends Connector
             return true;
         }
 
+        // A rejected token is rejected by the gateway before Correos sees the
+        // request, so this is as safe to send again as a 429 — once the token
+        // that failed has been thrown away.
+        if ($exception instanceof RequestException && $exception->getResponse()->status() === 401) {
+            $this->correosAuthenticator->forgetToken();
+
+            return true;
+        }
+
         if (! $this->isIdempotent($request)) {
             return false;
         }

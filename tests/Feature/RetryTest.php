@@ -10,6 +10,7 @@ use Arzcode\LaravelCorreos\Exceptions\CorreosApiException;
 use Arzcode\LaravelCorreos\Resources\PreregisterResource;
 use Arzcode\LaravelCorreos\Resources\TrackingResource;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
 
@@ -77,6 +78,37 @@ it('retries a read that fails with a gateway error', function (): void {
 it('retries a write that was rate limited, because it was never processed', function (): void {
     [$resource, $mockClient] = preregisterResourceReturning([
         MockResponse::make(['message' => 'Too Many Requests'], 429),
+        MockResponse::make(fixtureJson('preregister/delivery_response.json')),
+    ]);
+
+    $response = $resource->createShipments(retryShipmentRequest());
+
+    expect($response->fileIdentifier)->toBe('FILE001');
+
+    $mockClient->assertSentCount(2);
+});
+
+it('drops a rejected token and retries the read with a fresh one', function (): void {
+    Http::fake(['https://example.com/token' => Http::response(['idToken' => 'refreshed-token'])]);
+
+    [$resource, $mockClient] = trackingResourceReturning([
+        MockResponse::make(['message' => 'Unauthorized'], 401),
+        MockResponse::make(fixtureJson('tracking/search_response.json')),
+    ]);
+
+    $response = $resource->searchShipment('PQ1DR4A0000012345678');
+
+    expect($response->code)->toBe('PQ1DR4A0000012345678')
+        ->and(Cache::get(retryAuthenticator()->cacheKey()))->toBe('refreshed-token');
+
+    $mockClient->assertSentCount(2);
+});
+
+it('retries a write that was rejected for authentication, because it was never processed', function (): void {
+    Http::fake(['https://example.com/token' => Http::response(['idToken' => 'refreshed-token'])]);
+
+    [$resource, $mockClient] = preregisterResourceReturning([
+        MockResponse::make(['message' => 'Unauthorized'], 401),
         MockResponse::make(fixtureJson('preregister/delivery_response.json')),
     ]);
 

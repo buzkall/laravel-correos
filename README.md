@@ -295,6 +295,7 @@ twice:
 | Failure | Read (`GET`) | Write (`POST`) |
 | --- | --- | --- |
 | `429 Too Many Requests` | retried | retried — the gateway rejected it before Correos saw it |
+| `401 Unauthorized` | retried | retried — the cached token is dropped and a fresh one fetched |
 | `408`, `5xx` | retried | **not** retried |
 | Connection error, timeout | retried | **not** retried |
 | Any other `4xx` | not retried | not retried |

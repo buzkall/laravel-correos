@@ -47,6 +47,16 @@ class CorreosAuthenticator implements Authenticator
         return self::CACHE_KEY_PREFIX.':'.$accountHash;
     }
 
+    /**
+     * Drops the cached token so the next call fetches a fresh one. Used when
+     * the API rejects the token it was given: it may have been revoked, or the
+     * credentials rotated, long before its `exp` claim ran out.
+     */
+    public function forgetToken(): void
+    {
+        Cache::forget($this->cacheKey());
+    }
+
     protected function getToken(): string
     {
         $cachedToken = Cache::get($this->cacheKey());
