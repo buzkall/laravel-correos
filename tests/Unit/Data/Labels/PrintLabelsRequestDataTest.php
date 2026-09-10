@@ -39,6 +39,36 @@ it('serializes print labels request data without optional fields', function (): 
         ->toHaveKey('labelFormat', 2)->not->toHaveKey('clientLogo');
 });
 
+it('serializes the full set of print options', function (): void {
+    $data = PrintLabelsRequestData::from([
+        'documentationType' => 0,
+        'application' => 'P3',
+        'print' => [
+            'preregisterInd' => 1,
+            'labelOrderType' => 4,
+            'labelFormat' => 2,
+            'labelPrintMode' => 2,
+            'labelPrintInitialPosition' => 1,
+            'clientLogo' => '',
+            'shipments' => ['PQANEL9800000090108040Z'],
+        ],
+    ]);
+
+    expect($data->toArray())->toBe([
+        'documentationType' => 0,
+        'print' => [
+            'shipments' => ['PQANEL9800000090108040Z'],
+            'labelFormat' => 2,
+            'labelPrintMode' => 2,
+            'preregisterInd' => 1,
+            'labelOrderType' => 4,
+            'labelPrintInitialPosition' => 1,
+            'clientLogo' => '',
+        ],
+        'application' => 'P3',
+    ]);
+});
+
 it('deserializes labels response data', function (): void {
     $data = LabelsResponseData::from(fixtureJson('labels/labels_response.json'));
 

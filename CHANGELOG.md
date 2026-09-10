@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-correos` will be documented in this file.
 
+## 0.2.0 - 2026-09-10
+
+### Added
+
+- `preregisterInd` on `PrintData`, so labels can be printed from a package code instead of a shipment
+  code. Correos rejects the package code unless that flag marks the codes as shipments preregistered
+  earlier, and the README documents it alongside the matching `labelOrderType`.
+
 ## 0.1.0 - 2026-09-10
 
 First release under the `arzcode/laravel-correos` name. The package started as a fork of

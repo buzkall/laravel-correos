@@ -122,6 +122,25 @@ $labels->decodedPdf();   // The same PDF as raw bytes, or null if there is none
 `1` (A4) returns a full page with the labels already laid out on the sheet, `2` (labeler)
 returns one label per page at label size.
 
+To print from a package code rather than a shipment code, set `preregisterInd` to `1` and pass
+the matching `labelOrderType`. Correos rejects the package code without it, because that flag is
+what tells the API the codes belong to shipments preregistered earlier:
+
+```php
+use Arzcode\LaravelCorreos\Enums\LabelOrderType;
+
+$labels = $correos->labels()->printLabels(PrintLabelsRequestData::from([
+    'documentationType' => 1,
+    'print' => [
+        'shipments' => ['PQ1DR4A0000012345678'],
+        'labelFormat' => 2,
+        'labelPrintMode' => 1,
+        'preregisterInd' => 1, // the codes are preregistered shipments
+        'labelOrderType' => LabelOrderType::PackageId->value,
+    ],
+]));
+```
+
 <details>
 <summary>Composing your own A4 sheet with FPDI</summary>
 
