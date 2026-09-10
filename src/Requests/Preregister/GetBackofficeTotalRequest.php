@@ -1,11 +1,11 @@
 <?php
 
-namespace SmartDato\CorreosShipping\Requests\Preregister;
+namespace Arzcode\LaravelCorreos\Requests\Preregister;
 
+use Arzcode\LaravelCorreos\Data\Preregister\BackofficeResponseData;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 use Saloon\Http\Response;
-use SmartDato\CorreosShipping\Data\Preregister\BackofficeResponseData;
 
 class GetBackofficeTotalRequest extends Request
 {

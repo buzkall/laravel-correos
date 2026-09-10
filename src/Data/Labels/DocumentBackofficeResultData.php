@@ -1,6 +1,6 @@
 <?php
 
-namespace SmartDato\CorreosShipping\Data\Labels;
+namespace Arzcode\LaravelCorreos\Data\Labels;
 
 use Spatie\LaravelData\Data;
 

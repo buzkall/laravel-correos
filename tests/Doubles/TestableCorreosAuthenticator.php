@@ -1,8 +1,8 @@
 <?php
 
-namespace SmartDato\CorreosShipping\Tests\Doubles;
+namespace Arzcode\LaravelCorreos\Tests\Doubles;
 
-use SmartDato\CorreosShipping\Auth\CorreosAuthenticator;
+use Arzcode\LaravelCorreos\Auth\CorreosAuthenticator;
 
 /**
  * Exposes the authenticator's protected token helpers to the test suite.

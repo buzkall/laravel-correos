@@ -1,40 +1,40 @@
 <?php
 
-namespace SmartDato\CorreosShipping\Resources;
+namespace Arzcode\LaravelCorreos\Resources;
 
-use SmartDato\CorreosShipping\Connectors\PreregisterConnector;
-use SmartDato\CorreosShipping\Data\Preregister\AnnulmentExpeditionRequestData;
-use SmartDato\CorreosShipping\Data\Preregister\AnnulmentRequestData;
-use SmartDato\CorreosShipping\Data\Preregister\AnnulmentResponseData;
-use SmartDato\CorreosShipping\Data\Preregister\BackofficeResponseData;
-use SmartDato\CorreosShipping\Data\Preregister\CnDeliveryResponseData;
-use SmartDato\CorreosShipping\Data\Preregister\DeliveryRequestData;
-use SmartDato\CorreosShipping\Data\Preregister\DeliveryResponseData;
-use SmartDato\CorreosShipping\Data\Preregister\GenerateExpeditionResponseData;
-use SmartDato\CorreosShipping\Data\Preregister\GenerateShipmentCodeRequestData;
-use SmartDato\CorreosShipping\Data\Preregister\LabelsInfoResponseData;
-use SmartDato\CorreosShipping\Data\Preregister\ModifyResponseData;
-use SmartDato\CorreosShipping\Data\Preregister\PackageExpeditionResponseData;
-use SmartDato\CorreosShipping\Data\Preregister\PackageReferenceResponseData;
-use SmartDato\CorreosShipping\Data\Preregister\QueryRequestData;
-use SmartDato\CorreosShipping\Data\Preregister\QueryResponseData;
-use SmartDato\CorreosShipping\Data\Preregister\SearchLabelsInfoRequestData;
-use SmartDato\CorreosShipping\Requests\Preregister\CancelExpeditionRequest;
-use SmartDato\CorreosShipping\Requests\Preregister\CancelShipmentRequest;
-use SmartDato\CorreosShipping\Requests\Preregister\CreateCnShipmentsRequest;
-use SmartDato\CorreosShipping\Requests\Preregister\CreateShipmentsRequest;
-use SmartDato\CorreosShipping\Requests\Preregister\GenerateShipmentCodeRequest;
-use SmartDato\CorreosShipping\Requests\Preregister\GetBackofficeErrorsRequest;
-use SmartDato\CorreosShipping\Requests\Preregister\GetBackofficeShipmentRequest;
-use SmartDato\CorreosShipping\Requests\Preregister\GetBackofficeTotalRequest;
-use SmartDato\CorreosShipping\Requests\Preregister\GetBackofficeWaitingRequest;
-use SmartDato\CorreosShipping\Requests\Preregister\GetExpeditionPackagesRequest;
-use SmartDato\CorreosShipping\Requests\Preregister\GetPackagesByReferenceRequest;
-use SmartDato\CorreosShipping\Requests\Preregister\ModifyShipmentRequest;
-use SmartDato\CorreosShipping\Requests\Preregister\QueryShipmentsIrisRequest;
-use SmartDato\CorreosShipping\Requests\Preregister\QueryShipmentsRequest;
-use SmartDato\CorreosShipping\Requests\Preregister\SearchLabelsInfoRequest;
-use SmartDato\CorreosShipping\Requests\Preregister\ValidateShipmentsRequest;
+use Arzcode\LaravelCorreos\Connectors\PreregisterConnector;
+use Arzcode\LaravelCorreos\Data\Preregister\AnnulmentExpeditionRequestData;
+use Arzcode\LaravelCorreos\Data\Preregister\AnnulmentRequestData;
+use Arzcode\LaravelCorreos\Data\Preregister\AnnulmentResponseData;
+use Arzcode\LaravelCorreos\Data\Preregister\BackofficeResponseData;
+use Arzcode\LaravelCorreos\Data\Preregister\CnDeliveryResponseData;
+use Arzcode\LaravelCorreos\Data\Preregister\DeliveryRequestData;
+use Arzcode\LaravelCorreos\Data\Preregister\DeliveryResponseData;
+use Arzcode\LaravelCorreos\Data\Preregister\GenerateExpeditionResponseData;
+use Arzcode\LaravelCorreos\Data\Preregister\GenerateShipmentCodeRequestData;
+use Arzcode\LaravelCorreos\Data\Preregister\LabelsInfoResponseData;
+use Arzcode\LaravelCorreos\Data\Preregister\ModifyResponseData;
+use Arzcode\LaravelCorreos\Data\Preregister\PackageExpeditionResponseData;
+use Arzcode\LaravelCorreos\Data\Preregister\PackageReferenceResponseData;
+use Arzcode\LaravelCorreos\Data\Preregister\QueryRequestData;
+use Arzcode\LaravelCorreos\Data\Preregister\QueryResponseData;
+use Arzcode\LaravelCorreos\Data\Preregister\SearchLabelsInfoRequestData;
+use Arzcode\LaravelCorreos\Requests\Preregister\CancelExpeditionRequest;
+use Arzcode\LaravelCorreos\Requests\Preregister\CancelShipmentRequest;
+use Arzcode\LaravelCorreos\Requests\Preregister\CreateCnShipmentsRequest;
+use Arzcode\LaravelCorreos\Requests\Preregister\CreateShipmentsRequest;
+use Arzcode\LaravelCorreos\Requests\Preregister\GenerateShipmentCodeRequest;
+use Arzcode\LaravelCorreos\Requests\Preregister\GetBackofficeErrorsRequest;
+use Arzcode\LaravelCorreos\Requests\Preregister\GetBackofficeShipmentRequest;
+use Arzcode\LaravelCorreos\Requests\Preregister\GetBackofficeTotalRequest;
+use Arzcode\LaravelCorreos\Requests\Preregister\GetBackofficeWaitingRequest;
+use Arzcode\LaravelCorreos\Requests\Preregister\GetExpeditionPackagesRequest;
+use Arzcode\LaravelCorreos\Requests\Preregister\GetPackagesByReferenceRequest;
+use Arzcode\LaravelCorreos\Requests\Preregister\ModifyShipmentRequest;
+use Arzcode\LaravelCorreos\Requests\Preregister\QueryShipmentsIrisRequest;
+use Arzcode\LaravelCorreos\Requests\Preregister\QueryShipmentsRequest;
+use Arzcode\LaravelCorreos\Requests\Preregister\SearchLabelsInfoRequest;
+use Arzcode\LaravelCorreos\Requests\Preregister\ValidateShipmentsRequest;
 
 class PreregisterResource extends CorreosResource
 {

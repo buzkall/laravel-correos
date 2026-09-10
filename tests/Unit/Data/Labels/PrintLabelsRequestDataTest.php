@@ -1,8 +1,8 @@
 <?php
 
-use SmartDato\CorreosShipping\Data\Labels\DocumentResponseData;
-use SmartDato\CorreosShipping\Data\Labels\LabelsResponseData;
-use SmartDato\CorreosShipping\Data\Labels\PrintLabelsRequestData;
+use Arzcode\LaravelCorreos\Data\Labels\DocumentResponseData;
+use Arzcode\LaravelCorreos\Data\Labels\LabelsResponseData;
+use Arzcode\LaravelCorreos\Data\Labels\PrintLabelsRequestData;
 
 it('creates print labels request data', function (): void {
     $data = PrintLabelsRequestData::from([

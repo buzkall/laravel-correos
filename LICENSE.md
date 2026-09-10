@@ -1,6 +1,6 @@
 The MIT License (MIT)
 
-Copyright (c) SmartDato <info@smart-dato.com>
+Copyright (c) arzcode <git@arzcode.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

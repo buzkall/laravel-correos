@@ -1,8 +1,8 @@
 <?php
 
-namespace SmartDato\CorreosShipping\Data\Preregister;
+namespace Arzcode\LaravelCorreos\Data\Preregister;
 
-use SmartDato\CorreosShipping\Enums\ProductCode;
+use Arzcode\LaravelCorreos\Enums\ProductCode;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Optional;
 

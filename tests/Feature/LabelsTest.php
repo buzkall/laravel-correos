@@ -1,15 +1,15 @@
 <?php
 
+use Arzcode\LaravelCorreos\Auth\CorreosAuthenticator;
+use Arzcode\LaravelCorreos\Connectors\LabelsConnector;
+use Arzcode\LaravelCorreos\Data\Labels\PrintDocumentsRequestData;
+use Arzcode\LaravelCorreos\Data\Labels\PrintLabelsRequestData;
+use Arzcode\LaravelCorreos\Requests\Labels\PrintDocumentsRequest;
+use Arzcode\LaravelCorreos\Requests\Labels\PrintLabelsRequest;
+use Arzcode\LaravelCorreos\Resources\LabelsResource;
 use Illuminate\Support\Facades\Cache;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
-use SmartDato\CorreosShipping\Auth\CorreosAuthenticator;
-use SmartDato\CorreosShipping\Connectors\LabelsConnector;
-use SmartDato\CorreosShipping\Data\Labels\PrintDocumentsRequestData;
-use SmartDato\CorreosShipping\Data\Labels\PrintLabelsRequestData;
-use SmartDato\CorreosShipping\Requests\Labels\PrintDocumentsRequest;
-use SmartDato\CorreosShipping\Requests\Labels\PrintLabelsRequest;
-use SmartDato\CorreosShipping\Resources\LabelsResource;
 
 beforeEach(function (): void {
     Cache::put(
@@ -21,7 +21,7 @@ beforeEach(function (): void {
 
 function labelsConnector(): LabelsConnector
 {
-    config()->set('correos-shipping-sdk.base_urls.labels', 'https://api1.correos.es/support/labels/api/v1');
+    config()->set('laravel-correos.base_urls.labels', 'https://api1.correos.es/support/labels/api/v1');
 
     return new LabelsConnector(
         new CorreosAuthenticator('id', 'secret', 'https://example.com/token', 'AP3', 'gw-id', 'gw-secret')

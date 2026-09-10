@@ -1,6 +1,6 @@
 <?php
 
-namespace SmartDato\CorreosShipping\Data\Tracking;
+namespace Arzcode\LaravelCorreos\Data\Tracking;
 
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;

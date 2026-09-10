@@ -1,16 +1,16 @@
 <?php
 
-namespace SmartDato\CorreosShipping;
+namespace Arzcode\LaravelCorreos;
 
-use SmartDato\CorreosShipping\Auth\CorreosAuthenticator;
-use SmartDato\CorreosShipping\Connectors\LabelsConnector;
-use SmartDato\CorreosShipping\Connectors\PreregisterConnector;
-use SmartDato\CorreosShipping\Connectors\TrackingConnector;
-use SmartDato\CorreosShipping\Resources\LabelsResource;
-use SmartDato\CorreosShipping\Resources\PreregisterResource;
-use SmartDato\CorreosShipping\Resources\TrackingResource;
+use Arzcode\LaravelCorreos\Auth\CorreosAuthenticator;
+use Arzcode\LaravelCorreos\Connectors\LabelsConnector;
+use Arzcode\LaravelCorreos\Connectors\PreregisterConnector;
+use Arzcode\LaravelCorreos\Connectors\TrackingConnector;
+use Arzcode\LaravelCorreos\Resources\LabelsResource;
+use Arzcode\LaravelCorreos\Resources\PreregisterResource;
+use Arzcode\LaravelCorreos\Resources\TrackingResource;
 
-class CorreosShipping
+class Correos
 {
     protected ?PreregisterResource $preregisterResource = null;
 

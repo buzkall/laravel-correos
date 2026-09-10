@@ -11,15 +11,15 @@
  * Run manually with: vendor/bin/pest --group=sandbox
  */
 
+use Arzcode\LaravelCorreos\Auth\CorreosAuthenticator;
+use Arzcode\LaravelCorreos\Connectors\PreregisterConnector;
+use Arzcode\LaravelCorreos\Data\Preregister\DeliveryRequestData;
+use Arzcode\LaravelCorreos\Data\Preregister\DeliveryResponseData;
+use Arzcode\LaravelCorreos\Requests\Preregister\ValidateShipmentsRequest;
+use Arzcode\LaravelCorreos\Resources\PreregisterResource;
 use Dotenv\Dotenv;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
-use SmartDato\CorreosShipping\Auth\CorreosAuthenticator;
-use SmartDato\CorreosShipping\Connectors\PreregisterConnector;
-use SmartDato\CorreosShipping\Data\Preregister\DeliveryRequestData;
-use SmartDato\CorreosShipping\Data\Preregister\DeliveryResponseData;
-use SmartDato\CorreosShipping\Requests\Preregister\ValidateShipmentsRequest;
-use SmartDato\CorreosShipping\Resources\PreregisterResource;
 
 function sandboxAvailable(): bool
 {

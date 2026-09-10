@@ -1,6 +1,6 @@
 <?php
 
-namespace SmartDato\CorreosShipping\Exceptions;
+namespace Arzcode\LaravelCorreos\Exceptions;
 
 use JsonException;
 use Saloon\Exceptions\Request\RequestException;

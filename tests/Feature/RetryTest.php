@@ -1,17 +1,17 @@
 <?php
 
+use Arzcode\LaravelCorreos\Auth\CorreosAuthenticator;
+use Arzcode\LaravelCorreos\Connectors\PreregisterConnector;
+use Arzcode\LaravelCorreos\Connectors\TrackingConnector;
+use Arzcode\LaravelCorreos\Data\Preregister\DeliveryRequestData;
+use Arzcode\LaravelCorreos\Data\Preregister\DeliveryResponseData;
+use Arzcode\LaravelCorreos\Data\Tracking\ShipmentSearchResponseData;
+use Arzcode\LaravelCorreos\Exceptions\CorreosApiException;
+use Arzcode\LaravelCorreos\Resources\PreregisterResource;
+use Arzcode\LaravelCorreos\Resources\TrackingResource;
 use Illuminate\Support\Facades\Cache;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
-use SmartDato\CorreosShipping\Auth\CorreosAuthenticator;
-use SmartDato\CorreosShipping\Connectors\PreregisterConnector;
-use SmartDato\CorreosShipping\Connectors\TrackingConnector;
-use SmartDato\CorreosShipping\Data\Preregister\DeliveryRequestData;
-use SmartDato\CorreosShipping\Data\Preregister\DeliveryResponseData;
-use SmartDato\CorreosShipping\Data\Tracking\ShipmentSearchResponseData;
-use SmartDato\CorreosShipping\Exceptions\CorreosApiException;
-use SmartDato\CorreosShipping\Resources\PreregisterResource;
-use SmartDato\CorreosShipping\Resources\TrackingResource;
 
 beforeEach(function (): void {
     Cache::put(
@@ -32,7 +32,7 @@ function retryAuthenticator(): CorreosAuthenticator
  */
 function trackingResourceReturning(array $responses): array
 {
-    config()->set('correos-shipping-sdk.base_urls.tracking', 'https://api1.correos.es/support/trackpub/api/v2');
+    config()->set('laravel-correos.base_urls.tracking', 'https://api1.correos.es/support/trackpub/api/v2');
 
     $mockClient = new MockClient($responses);
     $connector = new TrackingConnector(retryAuthenticator(), retryInterval: 0);
@@ -47,7 +47,7 @@ function trackingResourceReturning(array $responses): array
  */
 function preregisterResourceReturning(array $responses): array
 {
-    config()->set('correos-shipping-sdk.base_urls.preregister', 'https://api1.correos.es/admissions/preregister/api/v1');
+    config()->set('laravel-correos.base_urls.preregister', 'https://api1.correos.es/admissions/preregister/api/v1');
 
     $mockClient = new MockClient($responses);
     $connector = new PreregisterConnector(retryAuthenticator(), retryInterval: 0);
@@ -125,7 +125,7 @@ it('gives up after the configured number of tries', function (): void {
 });
 
 it('sends no retries when they are switched off', function (): void {
-    config()->set('correos-shipping-sdk.base_urls.tracking', 'https://api1.correos.es/support/trackpub/api/v2');
+    config()->set('laravel-correos.base_urls.tracking', 'https://api1.correos.es/support/trackpub/api/v2');
 
     $mockClient = new MockClient([
         MockResponse::make(['message' => 'Service Unavailable'], 503),

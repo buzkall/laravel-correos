@@ -1,6 +1,6 @@
 <?php
 
-namespace SmartDato\CorreosShipping\Enums\Concerns;
+namespace Arzcode\LaravelCorreos\Enums\Concerns;
 
 trait HasOptions
 {

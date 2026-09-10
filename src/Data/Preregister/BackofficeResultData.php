@@ -1,6 +1,6 @@
 <?php
 
-namespace SmartDato\CorreosShipping\Data\Preregister;
+namespace Arzcode\LaravelCorreos\Data\Preregister;
 
 use Spatie\LaravelData\Data;
 

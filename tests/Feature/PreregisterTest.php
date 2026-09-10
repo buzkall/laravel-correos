@@ -1,20 +1,20 @@
 <?php
 
+use Arzcode\LaravelCorreos\Auth\CorreosAuthenticator;
+use Arzcode\LaravelCorreos\Connectors\PreregisterConnector;
+use Arzcode\LaravelCorreos\Data\Preregister\AnnulmentRequestData;
+use Arzcode\LaravelCorreos\Data\Preregister\DeliveryRequestData;
+use Arzcode\LaravelCorreos\Data\Preregister\GenerateShipmentCodeRequestData;
+use Arzcode\LaravelCorreos\Data\Preregister\QueryRequestData;
+use Arzcode\LaravelCorreos\Requests\Preregister\CancelShipmentRequest;
+use Arzcode\LaravelCorreos\Requests\Preregister\CreateShipmentsRequest;
+use Arzcode\LaravelCorreos\Requests\Preregister\GenerateShipmentCodeRequest;
+use Arzcode\LaravelCorreos\Requests\Preregister\QueryShipmentsRequest;
+use Arzcode\LaravelCorreos\Requests\Preregister\ValidateShipmentsRequest;
+use Arzcode\LaravelCorreos\Resources\PreregisterResource;
 use Illuminate\Support\Facades\Cache;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
-use SmartDato\CorreosShipping\Auth\CorreosAuthenticator;
-use SmartDato\CorreosShipping\Connectors\PreregisterConnector;
-use SmartDato\CorreosShipping\Data\Preregister\AnnulmentRequestData;
-use SmartDato\CorreosShipping\Data\Preregister\DeliveryRequestData;
-use SmartDato\CorreosShipping\Data\Preregister\GenerateShipmentCodeRequestData;
-use SmartDato\CorreosShipping\Data\Preregister\QueryRequestData;
-use SmartDato\CorreosShipping\Requests\Preregister\CancelShipmentRequest;
-use SmartDato\CorreosShipping\Requests\Preregister\CreateShipmentsRequest;
-use SmartDato\CorreosShipping\Requests\Preregister\GenerateShipmentCodeRequest;
-use SmartDato\CorreosShipping\Requests\Preregister\QueryShipmentsRequest;
-use SmartDato\CorreosShipping\Requests\Preregister\ValidateShipmentsRequest;
-use SmartDato\CorreosShipping\Resources\PreregisterResource;
 
 beforeEach(function (): void {
     Cache::put(
@@ -26,7 +26,7 @@ beforeEach(function (): void {
 
 function preregisterConnector(): PreregisterConnector
 {
-    config()->set('correos-shipping-sdk.base_urls.preregister', 'https://api1.correos.es/admissions/preregister/api/v1');
+    config()->set('laravel-correos.base_urls.preregister', 'https://api1.correos.es/admissions/preregister/api/v1');
 
     return new PreregisterConnector(
         new CorreosAuthenticator('id', 'secret', 'https://example.com/token', 'AP3', 'gw-id', 'gw-secret')

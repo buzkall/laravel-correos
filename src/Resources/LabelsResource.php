@@ -1,16 +1,16 @@
 <?php
 
-namespace SmartDato\CorreosShipping\Resources;
+namespace Arzcode\LaravelCorreos\Resources;
 
-use SmartDato\CorreosShipping\Connectors\LabelsConnector;
-use SmartDato\CorreosShipping\Data\Labels\DocumentBackofficeResponseData;
-use SmartDato\CorreosShipping\Data\Labels\DocumentResponseData;
-use SmartDato\CorreosShipping\Data\Labels\LabelsResponseData;
-use SmartDato\CorreosShipping\Data\Labels\PrintDocumentsRequestData;
-use SmartDato\CorreosShipping\Data\Labels\PrintLabelsRequestData;
-use SmartDato\CorreosShipping\Requests\Labels\GetDocumentBackofficeRequest;
-use SmartDato\CorreosShipping\Requests\Labels\PrintDocumentsRequest;
-use SmartDato\CorreosShipping\Requests\Labels\PrintLabelsRequest;
+use Arzcode\LaravelCorreos\Connectors\LabelsConnector;
+use Arzcode\LaravelCorreos\Data\Labels\DocumentBackofficeResponseData;
+use Arzcode\LaravelCorreos\Data\Labels\DocumentResponseData;
+use Arzcode\LaravelCorreos\Data\Labels\LabelsResponseData;
+use Arzcode\LaravelCorreos\Data\Labels\PrintDocumentsRequestData;
+use Arzcode\LaravelCorreos\Data\Labels\PrintLabelsRequestData;
+use Arzcode\LaravelCorreos\Requests\Labels\GetDocumentBackofficeRequest;
+use Arzcode\LaravelCorreos\Requests\Labels\PrintDocumentsRequest;
+use Arzcode\LaravelCorreos\Requests\Labels\PrintLabelsRequest;
 
 class LabelsResource extends CorreosResource
 {

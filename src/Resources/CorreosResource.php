@@ -1,12 +1,12 @@
 <?php
 
-namespace SmartDato\CorreosShipping\Resources;
+namespace Arzcode\LaravelCorreos\Resources;
 
+use Arzcode\LaravelCorreos\Exceptions\CorreosApiException;
 use Saloon\Exceptions\Request\RequestException;
 use Saloon\Http\Connector;
 use Saloon\Http\Request;
 use Saloon\Http\Response;
-use SmartDato\CorreosShipping\Exceptions\CorreosApiException;
 
 abstract class CorreosResource
 {

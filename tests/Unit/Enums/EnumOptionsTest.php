@@ -1,15 +1,15 @@
 <?php
 
-use SmartDato\CorreosShipping\Enums\AdmissionMethod;
-use SmartDato\CorreosShipping\Enums\Contracts\Optionable;
-use SmartDato\CorreosShipping\Enums\DocumentationType;
-use SmartDato\CorreosShipping\Enums\DoiType;
-use SmartDato\CorreosShipping\Enums\ErrorCodeLanguage;
-use SmartDato\CorreosShipping\Enums\LabelFormat;
-use SmartDato\CorreosShipping\Enums\LabelOrderType;
-use SmartDato\CorreosShipping\Enums\LabelPrintMode;
-use SmartDato\CorreosShipping\Enums\ProductCode;
-use SmartDato\CorreosShipping\Enums\ShipmentType;
+use Arzcode\LaravelCorreos\Enums\AdmissionMethod;
+use Arzcode\LaravelCorreos\Enums\Contracts\Optionable;
+use Arzcode\LaravelCorreos\Enums\DocumentationType;
+use Arzcode\LaravelCorreos\Enums\DoiType;
+use Arzcode\LaravelCorreos\Enums\ErrorCodeLanguage;
+use Arzcode\LaravelCorreos\Enums\LabelFormat;
+use Arzcode\LaravelCorreos\Enums\LabelOrderType;
+use Arzcode\LaravelCorreos\Enums\LabelPrintMode;
+use Arzcode\LaravelCorreos\Enums\ProductCode;
+use Arzcode\LaravelCorreos\Enums\ShipmentType;
 
 dataset('enums', [
     AdmissionMethod::class,

@@ -1,6 +1,6 @@
 <?php
 
-namespace SmartDato\CorreosShipping\Auth;
+namespace Arzcode\LaravelCorreos\Auth;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;

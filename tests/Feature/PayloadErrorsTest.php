@@ -1,29 +1,29 @@
 <?php
 
+use Arzcode\LaravelCorreos\Auth\CorreosAuthenticator;
+use Arzcode\LaravelCorreos\Connectors\LabelsConnector;
+use Arzcode\LaravelCorreos\Connectors\PreregisterConnector;
+use Arzcode\LaravelCorreos\Connectors\TrackingConnector;
+use Arzcode\LaravelCorreos\Data\Labels\LabelsResponseData;
+use Arzcode\LaravelCorreos\Data\Labels\PrintLabelsRequestData;
+use Arzcode\LaravelCorreos\Data\Preregister\AnnulmentRequestData;
+use Arzcode\LaravelCorreos\Data\Preregister\AnnulmentResponseData;
+use Arzcode\LaravelCorreos\Data\Preregister\DeliveryRequestData;
+use Arzcode\LaravelCorreos\Data\Preregister\QueryRequestData;
+use Arzcode\LaravelCorreos\Data\Preregister\QueryResponseData;
+use Arzcode\LaravelCorreos\Data\Tracking\ShipmentSearchResponseData;
+use Arzcode\LaravelCorreos\Exceptions\CorreosApiException;
+use Arzcode\LaravelCorreos\Requests\Labels\PrintLabelsRequest;
+use Arzcode\LaravelCorreos\Requests\Preregister\CancelShipmentRequest;
+use Arzcode\LaravelCorreos\Requests\Preregister\QueryShipmentsRequest;
+use Arzcode\LaravelCorreos\Requests\Preregister\ValidateShipmentsRequest;
+use Arzcode\LaravelCorreos\Requests\Tracking\SearchShipmentRequest;
+use Arzcode\LaravelCorreos\Resources\LabelsResource;
+use Arzcode\LaravelCorreos\Resources\PreregisterResource;
+use Arzcode\LaravelCorreos\Resources\TrackingResource;
 use Illuminate\Support\Facades\Cache;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
-use SmartDato\CorreosShipping\Auth\CorreosAuthenticator;
-use SmartDato\CorreosShipping\Connectors\LabelsConnector;
-use SmartDato\CorreosShipping\Connectors\PreregisterConnector;
-use SmartDato\CorreosShipping\Connectors\TrackingConnector;
-use SmartDato\CorreosShipping\Data\Labels\LabelsResponseData;
-use SmartDato\CorreosShipping\Data\Labels\PrintLabelsRequestData;
-use SmartDato\CorreosShipping\Data\Preregister\AnnulmentRequestData;
-use SmartDato\CorreosShipping\Data\Preregister\AnnulmentResponseData;
-use SmartDato\CorreosShipping\Data\Preregister\DeliveryRequestData;
-use SmartDato\CorreosShipping\Data\Preregister\QueryRequestData;
-use SmartDato\CorreosShipping\Data\Preregister\QueryResponseData;
-use SmartDato\CorreosShipping\Data\Tracking\ShipmentSearchResponseData;
-use SmartDato\CorreosShipping\Exceptions\CorreosApiException;
-use SmartDato\CorreosShipping\Requests\Labels\PrintLabelsRequest;
-use SmartDato\CorreosShipping\Requests\Preregister\CancelShipmentRequest;
-use SmartDato\CorreosShipping\Requests\Preregister\QueryShipmentsRequest;
-use SmartDato\CorreosShipping\Requests\Preregister\ValidateShipmentsRequest;
-use SmartDato\CorreosShipping\Requests\Tracking\SearchShipmentRequest;
-use SmartDato\CorreosShipping\Resources\LabelsResource;
-use SmartDato\CorreosShipping\Resources\PreregisterResource;
-use SmartDato\CorreosShipping\Resources\TrackingResource;
 
 beforeEach(function (): void {
     Cache::put(
@@ -40,7 +40,7 @@ function payloadErrorAuthenticator(): CorreosAuthenticator
 
 function labelsResourceAnswering(MockClient $mockClient): LabelsResource
 {
-    config()->set('correos-shipping-sdk.base_urls.labels', 'https://api1.correos.es/support/labels/api/v1');
+    config()->set('laravel-correos.base_urls.labels', 'https://api1.correos.es/support/labels/api/v1');
 
     $connector = new LabelsConnector(payloadErrorAuthenticator());
     $connector->withMockClient($mockClient);
@@ -50,7 +50,7 @@ function labelsResourceAnswering(MockClient $mockClient): LabelsResource
 
 function preregisterResourceAnswering(MockClient $mockClient): PreregisterResource
 {
-    config()->set('correos-shipping-sdk.base_urls.preregister', 'https://api1.correos.es/admissions/preregister/api/v1');
+    config()->set('laravel-correos.base_urls.preregister', 'https://api1.correos.es/admissions/preregister/api/v1');
 
     $connector = new PreregisterConnector(payloadErrorAuthenticator());
     $connector->withMockClient($mockClient);
@@ -60,7 +60,7 @@ function preregisterResourceAnswering(MockClient $mockClient): PreregisterResour
 
 function trackingResourceAnswering(MockClient $mockClient): TrackingResource
 {
-    config()->set('correos-shipping-sdk.base_urls.tracking', 'https://api1.correos.es/support/trackpub/api/v2');
+    config()->set('laravel-correos.base_urls.tracking', 'https://api1.correos.es/support/trackpub/api/v2');
 
     $connector = new TrackingConnector(payloadErrorAuthenticator());
     $connector->withMockClient($mockClient);

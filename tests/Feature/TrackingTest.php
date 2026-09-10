@@ -1,13 +1,13 @@
 <?php
 
+use Arzcode\LaravelCorreos\Auth\CorreosAuthenticator;
+use Arzcode\LaravelCorreos\Connectors\TrackingConnector;
+use Arzcode\LaravelCorreos\Requests\Tracking\GetExpeditionRequest;
+use Arzcode\LaravelCorreos\Requests\Tracking\SearchShipmentRequest;
+use Arzcode\LaravelCorreos\Resources\TrackingResource;
 use Illuminate\Support\Facades\Cache;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
-use SmartDato\CorreosShipping\Auth\CorreosAuthenticator;
-use SmartDato\CorreosShipping\Connectors\TrackingConnector;
-use SmartDato\CorreosShipping\Requests\Tracking\GetExpeditionRequest;
-use SmartDato\CorreosShipping\Requests\Tracking\SearchShipmentRequest;
-use SmartDato\CorreosShipping\Resources\TrackingResource;
 
 beforeEach(function (): void {
     Cache::put(
@@ -19,7 +19,7 @@ beforeEach(function (): void {
 
 function trackingConnector(): TrackingConnector
 {
-    config()->set('correos-shipping-sdk.base_urls.tracking', 'https://api1.correos.es/support/trackpub/api/v2');
+    config()->set('laravel-correos.base_urls.tracking', 'https://api1.correos.es/support/trackpub/api/v2');
 
     return new TrackingConnector(
         new CorreosAuthenticator('id', 'secret', 'https://example.com/token', 'AP3', 'gw-id', 'gw-secret')

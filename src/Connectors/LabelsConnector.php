@@ -1,11 +1,11 @@
 <?php
 
-namespace SmartDato\CorreosShipping\Connectors;
+namespace Arzcode\LaravelCorreos\Connectors;
 
 class LabelsConnector extends CorreosConnector
 {
     public function resolveBaseUrl(): string
     {
-        return $this->baseUrl ?? config('correos-shipping-sdk.base_urls.labels');
+        return $this->baseUrl ?? config('laravel-correos.base_urls.labels');
     }
 }

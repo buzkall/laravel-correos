@@ -1,12 +1,12 @@
 <?php
 
-namespace SmartDato\CorreosShipping\Resources;
+namespace Arzcode\LaravelCorreos\Resources;
 
-use SmartDato\CorreosShipping\Connectors\TrackingConnector;
-use SmartDato\CorreosShipping\Data\Tracking\ExpeditionResponseData;
-use SmartDato\CorreosShipping\Data\Tracking\ShipmentSearchResponseData;
-use SmartDato\CorreosShipping\Requests\Tracking\GetExpeditionRequest;
-use SmartDato\CorreosShipping\Requests\Tracking\SearchShipmentRequest;
+use Arzcode\LaravelCorreos\Connectors\TrackingConnector;
+use Arzcode\LaravelCorreos\Data\Tracking\ExpeditionResponseData;
+use Arzcode\LaravelCorreos\Data\Tracking\ShipmentSearchResponseData;
+use Arzcode\LaravelCorreos\Requests\Tracking\GetExpeditionRequest;
+use Arzcode\LaravelCorreos\Requests\Tracking\SearchShipmentRequest;
 
 class TrackingResource extends CorreosResource
 {

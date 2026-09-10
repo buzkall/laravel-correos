@@ -1,9 +1,9 @@
 <?php
 
-use SmartDato\CorreosShipping\Auth\CorreosAuthenticator;
-use SmartDato\CorreosShipping\Connectors\LabelsConnector;
-use SmartDato\CorreosShipping\Connectors\PreregisterConnector;
-use SmartDato\CorreosShipping\Connectors\TrackingConnector;
+use Arzcode\LaravelCorreos\Auth\CorreosAuthenticator;
+use Arzcode\LaravelCorreos\Connectors\LabelsConnector;
+use Arzcode\LaravelCorreos\Connectors\PreregisterConnector;
+use Arzcode\LaravelCorreos\Connectors\TrackingConnector;
 
 function makeAuthenticator(): CorreosAuthenticator
 {
@@ -18,7 +18,7 @@ function makeAuthenticator(): CorreosAuthenticator
 }
 
 it('preregister connector resolves correct base url', function (): void {
-    config()->set('correos-shipping-sdk.base_urls.preregister', 'https://api1.correos.es/admissions/preregister/api/v1');
+    config()->set('laravel-correos.base_urls.preregister', 'https://api1.correos.es/admissions/preregister/api/v1');
 
     $connector = new PreregisterConnector(makeAuthenticator());
 
@@ -26,7 +26,7 @@ it('preregister connector resolves correct base url', function (): void {
 });
 
 it('labels connector resolves correct base url', function (): void {
-    config()->set('correos-shipping-sdk.base_urls.labels', 'https://api1.correos.es/support/labels/api/v1');
+    config()->set('laravel-correos.base_urls.labels', 'https://api1.correos.es/support/labels/api/v1');
 
     $connector = new LabelsConnector(makeAuthenticator());
 
@@ -34,7 +34,7 @@ it('labels connector resolves correct base url', function (): void {
 });
 
 it('tracking connector resolves correct base url', function (): void {
-    config()->set('correos-shipping-sdk.base_urls.tracking', 'https://api1.correos.es/support/trackpub/api/v2');
+    config()->set('laravel-correos.base_urls.tracking', 'https://api1.correos.es/support/trackpub/api/v2');
 
     $connector = new TrackingConnector(makeAuthenticator());
 
@@ -69,7 +69,7 @@ it('connectors do not set force_ip_resolve when null', function (): void {
 it('connectors identify the sdk in the user agent', function (): void {
     $connector = new PreregisterConnector(makeAuthenticator());
 
-    expect($connector->headers()->get('User-Agent'))->toStartWith('SmartDato-CorreosShippingSDK');
+    expect($connector->headers()->get('User-Agent'))->toStartWith('Arzcode-LaravelCorreos');
 });
 
 it('connectors accept a custom user agent', function (): void {
@@ -87,10 +87,10 @@ it('connectors retry three times with exponential backoff by default', function 
 });
 
 it('connectors resolved from the container follow the retry config', function (): void {
-    config()->set('correos-shipping-sdk.retry.times', 5);
-    config()->set('correos-shipping-sdk.retry.interval', 100);
-    config()->set('correos-shipping-sdk.retry.exponential_backoff', false);
-    config()->set('correos-shipping-sdk.user_agent', 'LaAnonima/1.0');
+    config()->set('laravel-correos.retry.times', 5);
+    config()->set('laravel-correos.retry.interval', 100);
+    config()->set('laravel-correos.retry.exponential_backoff', false);
+    config()->set('laravel-correos.user_agent', 'LaAnonima/1.0');
 
     $connector = resolve(PreregisterConnector::class);
 
@@ -115,8 +115,8 @@ it('connectors accept timeouts', function (): void {
 });
 
 it('connectors resolved from the container follow the timeout config', function (): void {
-    config()->set('correos-shipping-sdk.timeout', '8');
-    config()->set('correos-shipping-sdk.connect_timeout', '3');
+    config()->set('laravel-correos.timeout', '8');
+    config()->set('laravel-correos.connect_timeout', '3');
 
     $connector = resolve(LabelsConnector::class);
 

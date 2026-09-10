@@ -1,14 +1,14 @@
 <?php
 
-namespace SmartDato\CorreosShipping\Requests\Preregister;
+namespace Arzcode\LaravelCorreos\Requests\Preregister;
 
+use Arzcode\LaravelCorreos\Data\Preregister\GenerateExpeditionResponseData;
+use Arzcode\LaravelCorreos\Data\Preregister\GenerateShipmentCodeRequestData;
 use Saloon\Contracts\Body\HasBody;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 use Saloon\Http\Response;
 use Saloon\Traits\Body\HasJsonBody;
-use SmartDato\CorreosShipping\Data\Preregister\GenerateExpeditionResponseData;
-use SmartDato\CorreosShipping\Data\Preregister\GenerateShipmentCodeRequestData;
 
 class GenerateShipmentCodeRequest extends Request implements HasBody
 {

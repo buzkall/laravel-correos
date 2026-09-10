@@ -1,14 +1,14 @@
 <?php
 
-namespace SmartDato\CorreosShipping\Requests\Labels;
+namespace Arzcode\LaravelCorreos\Requests\Labels;
 
+use Arzcode\LaravelCorreos\Data\Labels\DocumentResponseData;
+use Arzcode\LaravelCorreos\Data\Labels\PrintDocumentsRequestData;
 use Saloon\Contracts\Body\HasBody;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 use Saloon\Http\Response;
 use Saloon\Traits\Body\HasJsonBody;
-use SmartDato\CorreosShipping\Data\Labels\DocumentResponseData;
-use SmartDato\CorreosShipping\Data\Labels\PrintDocumentsRequestData;
 
 class PrintDocumentsRequest extends Request implements HasBody
 {

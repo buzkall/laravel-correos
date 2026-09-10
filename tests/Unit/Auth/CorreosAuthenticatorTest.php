@@ -1,12 +1,12 @@
 <?php
 
+use Arzcode\LaravelCorreos\Auth\CorreosAuthenticator;
+use Arzcode\LaravelCorreos\Connectors\LabelsConnector;
+use Arzcode\LaravelCorreos\Data\Labels\PrintLabelsRequestData;
+use Arzcode\LaravelCorreos\Requests\Labels\PrintLabelsRequest;
+use Arzcode\LaravelCorreos\Tests\Doubles\TestableCorreosAuthenticator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
-use SmartDato\CorreosShipping\Auth\CorreosAuthenticator;
-use SmartDato\CorreosShipping\Connectors\LabelsConnector;
-use SmartDato\CorreosShipping\Data\Labels\PrintLabelsRequestData;
-use SmartDato\CorreosShipping\Requests\Labels\PrintLabelsRequest;
-use SmartDato\CorreosShipping\Tests\Doubles\TestableCorreosAuthenticator;
 
 /**
  * @param  array<string, mixed>  $claims
@@ -41,7 +41,7 @@ it('sets authorization and gateway headers on pending request', function (): voi
     );
 
     Cache::put($authenticator->cacheKey(), 'fake-test-token', 3600);
-    config()->set('correos-shipping-sdk.base_urls.labels', 'https://api1.correos.es/support/labels/api/v1');
+    config()->set('laravel-correos.base_urls.labels', 'https://api1.correos.es/support/labels/api/v1');
 
     $request = new PrintLabelsRequest(PrintLabelsRequestData::from([
         'documentationType' => 1,

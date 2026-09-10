@@ -1,126 +1,64 @@
 # Correos Shipping SDK
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/smart-dato/correos-shipping-sdk.svg?style=flat-square)](https://packagist.org/packages/smart-dato/correos-shipping-sdk)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/smart-dato/correos-shipping-sdk/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/smart-dato/correos-shipping-sdk/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/smart-dato/correos-shipping-sdk/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/smart-dato/correos-shipping-sdk/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/smart-dato/correos-shipping-sdk.svg?style=flat-square)](https://packagist.org/packages/smart-dato/correos-shipping-sdk)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/arzcode/laravel-correos.svg?style=flat-square)](https://packagist.org/packages/arzcode/laravel-correos)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/buzkall/laravel-correos/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/buzkall/laravel-correos/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/buzkall/laravel-correos/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/buzkall/laravel-correos/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
+[![Total Downloads](https://img.shields.io/packagist/dt/arzcode/laravel-correos.svg?style=flat-square)](https://packagist.org/packages/arzcode/laravel-correos)
 
-Laravel package for integrating with the Correos (Spanish postal service) APIs. Supports shipment preregistration, label and customs document generation, and tracking. Built on [Saloon 4.x](https://docs.saloon.dev) for HTTP and [Spatie Laravel Data 4.x](https://spatie.be/docs/laravel-data) for DTOs.
+Laravel package for the Correos (Spanish postal service) APIs: shipment preregistration,
+label and customs document generation, and tracking. Built on [Saloon 4.x](https://docs.saloon.dev)
+for HTTP and [Spatie Laravel Data 4.x](https://spatie.be/docs/laravel-data) for DTOs.
 
-## Requirements
+Requires **PHP 8.4+** and **Laravel 11, 12 or 13**.
 
-- PHP 8.4+
-- Laravel 11, 12 or 13
-
-Collections (*recogidas*) are not covered: the API has no resource for them yet, so shipments are handed over at an office or picked up under a standing agreement.
+> Collections (*recogidas*) are not covered: the API has no resource for them yet, so
+> shipments are handed over at an office or picked up under a standing agreement.
 
 ## Installation
 
-Install the package via Composer:
-
 ```bash
-composer require smart-dato/correos-shipping-sdk
+composer require arzcode/laravel-correos
+php artisan vendor:publish --tag="laravel-correos-config"
 ```
 
-Publish the config file:
-
-```bash
-php artisan vendor:publish --tag="correos-shipping-sdk-config"
-```
-
-## Configuration
-
-Add the following environment variables to your `.env` file:
+Add your credentials to `.env`:
 
 ```env
-# OAuth credentials (CorreosID)
 CORREOS_OAUTH_CLIENT_ID=your-oauth-client-id
 CORREOS_OAUTH_CLIENT_SECRET=your-oauth-client-secret
-
-# API Gateway credentials
 CORREOS_GATEWAY_CLIENT_ID=your-gateway-client-id
 CORREOS_GATEWAY_CLIENT_SECRET=your-gateway-client-secret
 ```
 
-The published config file (`config/correos-shipping-sdk.php`) contains all available options:
-
-```php
-return [
-    'oauth' => [
-        'client_id'     => env('CORREOS_OAUTH_CLIENT_ID'),
-        'client_secret' => env('CORREOS_OAUTH_CLIENT_SECRET'),
-        'token_url'     => env('CORREOS_TOKEN_URL', 'https://apioauthcid.correos.es/Api/Authorize/Token'),
-        'scope'         => env('CORREOS_OAUTH_SCOPE', 'AP3 LBS RCG'),
-    ],
-    'gateway' => [
-        'client_id'     => env('CORREOS_GATEWAY_CLIENT_ID'),
-        'client_secret' => env('CORREOS_GATEWAY_CLIENT_SECRET'),
-    ],
-    'base_urls' => [
-        'preregister' => env('CORREOS_PREREGISTER_URL', 'https://api1.correos.es/admissions/preregister/api/v1'),
-        'labels'      => env('CORREOS_LABELS_URL', 'https://api1.correos.es/support/labels/api/v1'),
-        'tracking'    => env('CORREOS_TRACKING_URL', 'https://api1.correos.es/support/trackpub/api/v2'),
-    ],
-    'verify_ssl' => env('CORREOS_VERIFY_SSL', true),
-    'force_ip_resolve' => env('CORREOS_FORCE_IP_RESOLVE'),
-    'retry' => [
-        'times'               => env('CORREOS_RETRY_TIMES', 3),
-        'interval'            => env('CORREOS_RETRY_INTERVAL', 500), // milliseconds
-        'exponential_backoff' => env('CORREOS_RETRY_EXPONENTIAL_BACKOFF', true),
-    ],
-    'timeout' => env('CORREOS_TIMEOUT'),                  // seconds; Saloon default 30
-    'connect_timeout' => env('CORREOS_CONNECT_TIMEOUT'),  // seconds; Saloon default 10
-    'user_agent' => env('CORREOS_USER_AGENT'),
-];
-```
-
-For the **pre-production** environment, override the URLs:
-
-```env
-CORREOS_TOKEN_URL=https://apioauthcid.correospre.es/Api/Authorize/Token
-CORREOS_PREREGISTER_URL=https://api1.correospre.es/admissions/preregister/api/v1
-CORREOS_LABELS_URL=https://api1.correospre.es/support/labels/api/v1
-CORREOS_TRACKING_URL=https://api1.correospre.es/support/trackpub/api/v2
-```
-
-If the pre-production environment uses self-signed certificates, you can disable SSL verification:
-
-```env
-CORREOS_VERIFY_SSL=false
-```
-
-> **Warning:** Never disable SSL verification in production.
-
-If the pre-production environment only allows IPv4 connections (e.g., CloudFront blocks IPv6), you can force IPv4 resolution:
-
-```env
-CORREOS_FORCE_IP_RESOLVE=v4
-```
-
-### Network access
-
-Correos whitelists the client IP for the pre-production environment: connections from a
-non-whitelisted address (and any IPv6 address, which CloudFront answers with a `403`) are
-rejected before they reach the API, and PRE is only up Monday to Friday, 08:00–20:00 CET.
-Confirm with your Correos commercial contact whether your production contract carries the
-same restriction; if it does, every host that calls the API — web servers, queue workers,
-scheduled jobs — has to egress from a fixed, whitelisted IPv4 address, which usually means
-pinning them to a static IP or routing them through a NAT gateway.
+That is all production needs. Everything else in `config/laravel-correos.php` has a
+working default — see [Configuration reference](#configuration-reference) for the rest.
 
 ## Usage
 
-Resolve the SDK from the container (or use the `CorreosShipping` facade):
+Resolve the SDK from the container:
 
 ```php
-use SmartDato\CorreosShipping\CorreosShipping;
+use Arzcode\LaravelCorreos\Correos;
 
-$correos = app(CorreosShipping::class);
+$correos = app(Correos::class);
+$correos->preregister()->createShipments($request);
 ```
 
-### Preregister Shipments
+Or reach the same instance through the facade:
 
 ```php
-use SmartDato\CorreosShipping\Data\Preregister\DeliveryRequestData;
+use Arzcode\LaravelCorreos\Facades\Correos;
+
+Correos::preregister()->createShipments($request);
+```
+
+Outside Laravel, or with runtime credentials, build one by hand with
+`Arzcode\LaravelCorreos\Correos::make(['oauth_client_id' => ..., 'gateway_client_id' => ..., ...])`.
+
+### Preregister a shipment
+
+```php
+use Arzcode\LaravelCorreos\Data\Preregister\DeliveryRequestData;
 
 $request = DeliveryRequestData::from([
     'shipments' => [
@@ -154,45 +92,42 @@ $request = DeliveryRequestData::from([
     ],
 ]);
 
-// Validate before creating
-$validation = $correos->preregister()->validateShipments($request);
-
-// Create the shipment
+$correos->preregister()->validateShipments($request);   // dry run, no shipment created
 $response = $correos->preregister()->createShipments($request);
 
-$response->fileIdentifier;  // "FILE001"
-$response->shipments[0]->shipmentCode;  // "PQXYZ1234567890"
-$response->shipments[0]->packages[0]->packageCode;  // "PQ1DR4A0000012345678"
+$response->fileIdentifier;                            // "FILE001"
+$response->shipments[0]->shipmentCode;                // "PQXYZ1234567890"
+$response->shipments[0]->packages[0]->packageCode;    // "PQ1DR4A0000012345678"
 ```
 
-### Print Labels
+### Print labels
 
 ```php
-use SmartDato\CorreosShipping\Data\Labels\PrintLabelsRequestData;
+use Arzcode\LaravelCorreos\Data\Labels\PrintLabelsRequestData;
 
-$labelRequest = PrintLabelsRequestData::from([
+$labels = $correos->labels()->printLabels(PrintLabelsRequestData::from([
     'documentationType' => 1, // 0=All, 1=Label, 2=CN22/CN23
     'print' => [
         'shipments' => ['PQXYZ1234567890'],
         'labelFormat' => 2,    // 1=XML, 2=PDF, 3=ZPL
         'labelPrintMode' => 1, // 1=A4, 2=Labeler
     ],
-]);
-
-$labels = $correos->labels()->printLabels($labelRequest);
+]));
 
 $labels->pdf;            // Base64-encoded PDF content
 $labels->decodedPdf();   // The same PDF as raw bytes, or null if there is none
 ```
 
 `labelPrintMode` decides what that PDF contains, and the two modes are not interchangeable:
+`1` (A4) returns a full page with the labels already laid out on the sheet, `2` (labeler)
+returns one label per page at label size.
 
-- `1` (A4) returns a full A4 page with the labels already laid out on the sheet.
-- `2` (labeler) returns one label per page, at label size.
+<details>
+<summary>Composing your own A4 sheet with FPDI</summary>
 
-To place labels yourself on an A4 sheet — starting at an arbitrary cell, or mixing carriers on
-one sheet — ask for mode `2` and compose the page with FPDI; mode `1` gives you a page you
-would have to cut up again:
+To place labels yourself — starting at an arbitrary cell, or mixing carriers on one sheet —
+ask for mode `2` and compose the page; mode `1` gives you a sheet you would have to cut up
+again:
 
 ```php
 use setasign\Fpdi\Fpdi;
@@ -216,26 +151,26 @@ foreach (range(1, $pages) as $cell => $page) {
 }
 ```
 
-### Print Customs Documents (DCAF/DDP)
+</details>
+
+### Print customs documents (DCAF/DDP)
 
 ```php
-use SmartDato\CorreosShipping\Data\Labels\PrintDocumentsRequestData;
+use Arzcode\LaravelCorreos\Data\Labels\PrintDocumentsRequestData;
 
-$docRequest = PrintDocumentsRequestData::from([
+$document = $correos->labels()->printDocuments(PrintDocumentsRequestData::from([
     'documentationType' => 5, // 5=DCAF, 6=DDP
     'documentData' => [
         'destinationName' => 'France',
         'contractNumber' => '12345678',
         'clientNumber' => '1234567890',
     ],
-]);
-
-$document = $correos->labels()->printDocuments($docRequest);
+]));
 
 $document->pdf;  // Base64-encoded PDF
 ```
 
-### Track Shipments
+### Track a shipment
 
 ```php
 $tracking = $correos->tracking()->searchShipment('PQ1DR4A0000012345678');
@@ -244,7 +179,6 @@ $tracking->code;          // "PQ1DR4A0000012345678"
 $tracking->codProduct;    // "PQDOM"
 $tracking->remitName;     // Sender name
 $tracking->destiName;     // Addressee name
-$tracking->events;        // Array of TrackingEventData
 
 foreach ($tracking->events as $event) {
     $event->eventDate;     // "06/02/2026"
@@ -254,102 +188,68 @@ foreach ($tracking->events as $event) {
 }
 ```
 
-### Track Expeditions
+### All available methods
+
+Every method takes and returns typed DTOs from `Arzcode\LaravelCorreos\Data\*`.
+
+**`$correos->preregister()`**
+
+| Method | Purpose |
+| --- | --- |
+| `validateShipments(DeliveryRequestData)` | Validate without creating |
+| `createShipments(DeliveryRequestData)` | Create shipments |
+| `createCnShipments(DeliveryRequestData)` | Create shipments with CN22/CN23 customs data |
+| `modifyShipment(DeliveryRequestData)` | Modify an existing shipment |
+| `cancelShipment(AnnulmentRequestData)` | Cancel a shipment |
+| `cancelExpedition(AnnulmentExpeditionRequestData)` | Cancel a whole expedition |
+| `generateShipmentCode(GenerateShipmentCodeRequestData)` | Reserve codes without preregistering |
+| `queryShipments(QueryRequestData)` | Query shipments by code |
+| `queryShipmentsIris(QueryRequestData)` | Same query against the IRIS backend |
+| `getExpeditionPackages(string $expeditionCode)` | Packages of an expedition |
+| `getPackagesByReference(string $clientReference, ?string $contractNumber, ?string $clientNumber)` | Look up by your own reference |
+| `searchLabelsInfo(SearchLabelsInfoRequestData)` | Label metadata for a set of shipments |
+| `getBackofficeShipment(string $shipmentCode)` | Backoffice detail for one shipment |
+| `getBackofficeErrors(?$contractNumber, ?$clientNumber, ?$dateFrom, ?$dateTo)` | Shipments rejected by the backoffice |
+| `getBackofficeTotal(?$contractNumber, ?$clientNumber, ?$dateFrom, ?$dateTo)` | Totals for a period |
+| `getBackofficeWaiting(?$contractNumber, ?$clientNumber, ?$dateFrom, ?$dateTo)` | Shipments waiting for admission |
+
+**`$correos->labels()`**
+
+| Method | Purpose |
+| --- | --- |
+| `printLabels(PrintLabelsRequestData)` | Labels as PDF, XML or ZPL |
+| `printDocuments(PrintDocumentsRequestData)` | Customs documents (DCAF/DDP) |
+| `getDocumentBackoffice(string $shipment)` | Documents already generated for a shipment |
+
+**`$correos->tracking()`**
+
+| Method | Purpose |
+| --- | --- |
+| `searchShipment(string $shippingCode)` | Shipment status and event history |
+| `getExpedition(string $expeditionCode)` | Expedition with its clients and packages |
+
+### Enums
+
+Typed enums cover the API's magic numbers. Each case carries a human readable `label()`, and
+every enum exposes `options()` — value => label pairs, ready for a select input:
 
 ```php
-$expedition = $correos->tracking()->getExpedition('EXP001234567890');
+use Arzcode\LaravelCorreos\Enums\ProductCode;    // PaqPremium, PaqEstandar, PaqToday, ...
+use Arzcode\LaravelCorreos\Enums\LabelPrintMode; // A4, Labeler
 
-$expedition->refExpedition;       // "EXP001234567890"
-$expedition->serviceDescription;  // "Paq Premium"
-$expedition->clients;             // Array of ExpeditionClientData
-$expedition->packages;            // Array of ExpeditionPackageData
-```
-
-### Other Preregister Operations
-
-```php
-// Cancel a shipment
-$correos->preregister()->cancelShipment(
-    AnnulmentRequestData::from(['packageCode' => 'PQ1DR4A0000012345678'])
-);
-
-// Cancel an expedition
-$correos->preregister()->cancelExpedition(
-    AnnulmentExpeditionRequestData::from(['expeditionCode' => 'EXP001234567890'])
-);
-
-// Generate shipment codes
-$correos->preregister()->generateShipmentCode(
-    GenerateShipmentCodeRequestData::from([
-        'contractNumber' => '12345678',
-        'clientNumber' => '1234567890',
-        'labellerCode' => '0001',
-        'packagesNumber' => '1',
-        'product' => 'PAFXB',
-        'deliveryMethod' => 'DOUAOF',
-    ])
-);
-
-// Modify a shipment
-$correos->preregister()->modifyShipment($deliveryRequestData);
-
-// Query shipments
-$correos->preregister()->queryShipments(
-    QueryRequestData::from(['shipments' => ['PQ1DR4A0000012345678']])
-);
-
-// Get expedition packages
-$correos->preregister()->getExpeditionPackages('EXP001234567890');
-
-// Search by client reference
-$correos->preregister()->getPackagesByReference('MY-REF-001');
-
-// Backoffice queries
-$correos->preregister()->getBackofficeShipment('PQXYZ1234567890');
-$correos->preregister()->getBackofficeErrors(contractNumber: '12345678');
-$correos->preregister()->getBackofficeTotal(dateFrom: '01/01/2026', dateTo: '31/01/2026');
-$correos->preregister()->getBackofficeWaiting();
-```
-
-### Using the Facade
-
-```php
-use SmartDato\CorreosShipping\Facades\CorreosShipping;
-
-$response = CorreosShipping::preregister()->createShipments($request);
-$labels = CorreosShipping::labels()->printLabels($labelRequest);
-$tracking = CorreosShipping::tracking()->searchShipment('PQ1DR4A0000012345678');
-```
-
-## Available Enums
-
-The package provides typed enums for API constants:
-
-```php
-use SmartDato\CorreosShipping\Enums\DocumentationType;  // All, Label, CN22_CN23, DCAF, DDP
-use SmartDato\CorreosShipping\Enums\LabelFormat;         // XML, PDF, ZPL
-use SmartDato\CorreosShipping\Enums\LabelPrintMode;      // A4, Labeler
-use SmartDato\CorreosShipping\Enums\LabelOrderType;      // InternationalPoBox, Company, LastName, PackageId, ClientReference
-use SmartDato\CorreosShipping\Enums\ShipmentType;        // Documents, Goods, Gift, Samples, Returns, Other, Dangerous
-use SmartDato\CorreosShipping\Enums\DoiType;             // European, DNI, NIE, Other, CIF
-use SmartDato\CorreosShipping\Enums\AdmissionMethod;     // Office, Citypaq, DeliveryUnit
-use SmartDato\CorreosShipping\Enums\ErrorCodeLanguage;   // Spanish, English
-```
-
-Each case carries a human readable `label()`, and every enum exposes `options()` — value =>
-label pairs, ready for a select input:
-
-```php
 ProductCode::PaqPremium->label();  // "Paq Premium"
 LabelPrintMode::options();         // [1 => 'A4 sheet', 2 => 'Labeler']
 ```
 
-## Error Handling
+The full set: `ProductCode`, `DocumentationType`, `LabelFormat`, `LabelPrintMode`,
+`LabelOrderType`, `ShipmentType`, `DoiType`, `AdmissionMethod` and `ErrorCodeLanguage`.
+
+## Error handling
 
 API errors are thrown as `CorreosApiException`, which extends Saloon's `RequestException`:
 
 ```php
-use SmartDato\CorreosShipping\Exceptions\CorreosApiException;
+use Arzcode\LaravelCorreos\Exceptions\CorreosApiException;
 
 try {
     $response = $correos->preregister()->createShipments($request);
@@ -362,42 +262,32 @@ try {
 }
 ```
 
-### Errors returned with a 200
-
-Part of the Correos surface answers failures with HTTP 200 and an `error` field rather than
-an error status — printing a label for an unknown shipment comes back as `200` with a null
-`pdf` and a filled `error`. Those payloads are turned into the same `CorreosApiException`, so
-a call that returns a DTO has returned a usable one:
+Part of the Correos surface answers failures with HTTP 200 and an `error` field instead of an
+error status — printing a label for an unknown shipment comes back as `200` with a null `pdf`
+and a filled `error`. Those payloads raise the same exception, so a call that returns a DTO
+has returned a usable one:
 
 ```php
 $labels = $correos->labels()->printLabels($labelRequest);
 
 // Never reached when Correos answered `{"pdf": null, "error": "El envío no existe"}`.
-$pdf = base64_decode($labels->pdf);
+$pdf = $labels->decodedPdf();
 ```
 
 The check covers the top-level `error`/`errors` field of every response. Nested errors stay on
 the DTO, because there they are the answer rather than a failure: `validateShipments()` still
 returns its per-shipment `validationErrorCount` and `error` list without throwing.
 
-The raw response of the last call — including a failed one — is available on the resource:
+The raw response of the last call — including a failed one — stays on the resource:
 
 ```php
 $correos->labels()->lastResponse()?->body();
 ```
 
-## Retries
+## Retries and idempotency
 
 The API gateway rate limits, so transient failures are retried three times with exponential
-backoff, starting at 500 ms:
-
-```env
-CORREOS_RETRY_TIMES=3
-CORREOS_RETRY_INTERVAL=500
-CORREOS_RETRY_EXPONENTIAL_BACKOFF=true
-```
-
-Set `CORREOS_RETRY_TIMES=1` to switch retries off.
+backoff starting at 500 ms. Set `CORREOS_RETRY_TIMES=1` to switch retries off.
 
 What is retried is deliberately narrow, because a retried write can book the same shipment
 twice:
@@ -409,11 +299,8 @@ twice:
 | Connection error, timeout | retried | **not** retried |
 | Any other `4xx` | not retried | not retried |
 
-A write that fails on a timeout or a gateway error may well have been processed, so it is
-surfaced to you instead of being repeated. See [Idempotency](#idempotency) for how to settle
-one.
-
-## Idempotency
+<details>
+<summary>Making <code>createShipments()</code> safe to repeat</summary>
 
 `createShipments()` is not idempotent: a request that times out after Correos has registered
 the shipment leaves you unable to tell success from failure, and sending it again books a
@@ -433,23 +320,76 @@ if ($packages->packageCodes) {
 }
 ```
 
-## User agent
+</details>
 
-Requests identify the SDK and its installed version (`SmartDato-CorreosShippingSDK/1.2.3`).
-Override it if Correos asks you to identify your own application:
+## Configuration reference
+
+<details>
+<summary>Every environment variable</summary>
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `CORREOS_OAUTH_CLIENT_ID` | — | CorreosID OAuth client id |
+| `CORREOS_OAUTH_CLIENT_SECRET` | — | CorreosID OAuth client secret |
+| `CORREOS_GATEWAY_CLIENT_ID` | — | API gateway client id |
+| `CORREOS_GATEWAY_CLIENT_SECRET` | — | API gateway client secret |
+| `CORREOS_TOKEN_URL` | `https://apioauthcid.correos.es/Api/Authorize/Token` | OAuth token endpoint |
+| `CORREOS_OAUTH_SCOPE` | `AP3 LBS RCG` | Requested scopes |
+| `CORREOS_PREREGISTER_URL` | `https://api1.correos.es/admissions/preregister/api/v1` | Preregister base URL |
+| `CORREOS_LABELS_URL` | `https://api1.correos.es/support/labels/api/v1` | Labels base URL |
+| `CORREOS_TRACKING_URL` | `https://api1.correos.es/support/trackpub/api/v2` | Tracking base URL |
+| `CORREOS_VERIFY_SSL` | `true` | Verify TLS certificates |
+| `CORREOS_FORCE_IP_RESOLVE` | — | `v4` to force IPv4 |
+| `CORREOS_RETRY_TIMES` | `3` | Attempts per request |
+| `CORREOS_RETRY_INTERVAL` | `500` | Milliseconds before the first retry |
+| `CORREOS_RETRY_EXPONENTIAL_BACKOFF` | `true` | Double the interval each attempt |
+| `CORREOS_TIMEOUT` | Saloon's 30s | Request timeout, seconds |
+| `CORREOS_CONNECT_TIMEOUT` | Saloon's 10s | Connection timeout, seconds |
+| `CORREOS_USER_AGENT` | `Arzcode-LaravelCorreos/1.2.3` | Override to identify your own app |
+
+</details>
+
+<details>
+<summary>Pre-production environment</summary>
+
+Override the four URLs:
 
 ```env
-CORREOS_USER_AGENT="LaAnonima/2.1"
+CORREOS_TOKEN_URL=https://apioauthcid.correospre.es/Api/Authorize/Token
+CORREOS_PREREGISTER_URL=https://api1.correospre.es/admissions/preregister/api/v1
+CORREOS_LABELS_URL=https://api1.correospre.es/support/labels/api/v1
+CORREOS_TRACKING_URL=https://api1.correospre.es/support/trackpub/api/v2
 ```
+
+PRE tends to use self-signed certificates and to answer on IPv4 only, so you may also need:
+
+```env
+CORREOS_VERIFY_SSL=false
+CORREOS_FORCE_IP_RESOLVE=v4
+```
+
+> **Warning:** never disable SSL verification in production.
+
+**Network access.** Correos whitelists the client IP for PRE: connections from a
+non-whitelisted address (and any IPv6 address, which CloudFront answers with a `403`) are
+rejected before they reach the API, and PRE is only up Monday to Friday, 08:00–20:00 CET.
+Confirm with your Correos commercial contact whether your production contract carries the
+same restriction; if it does, every host that calls the API — web servers, queue workers,
+scheduled jobs — has to egress from a fixed, whitelisted IPv4 address, which usually means
+pinning them to a static IP or routing them through a NAT gateway.
+
+</details>
 
 ## Using it from Filament (or any Livewire component)
 
 Nothing special is needed to call the SDK from a Filament page or action — but four things
 are worth knowing.
 
-**Strip nulls before hydrating a DTO.** Optional fields are typed `string|Optional`, and a
-Filament form submits `null` for the ones the user left alone, which is a `TypeError` rather
-than a validation error:
+<details>
+<summary>Strip nulls before hydrating a DTO</summary>
+
+Optional fields are typed `string|Optional`, and a Filament form submits `null` for the ones
+the user left alone, which is a `TypeError` rather than a validation error:
 
 ```php
 $clean = fn (array $values) => collect($values)
@@ -460,18 +400,27 @@ $clean = fn (array $values) => collect($values)
 $request = DeliveryRequestData::from($clean($this->form->getState()));
 ```
 
-**Keep writes off the request cycle.** `createShipments()` is not idempotent and is not
-retried on transport failures, so run it from a queued job and report back with a
-notification. If you do call the API inline, lower the timeouts for that path — the defaults
-(30s per attempt, three attempts on reads) are sized for a worker, not for someone watching a
-spinner:
+</details>
+
+<details>
+<summary>Keep writes off the request cycle</summary>
+
+`createShipments()` is not idempotent and is not retried on transport failures, so run it
+from a queued job and report back with a notification. If you do call the API inline, lower
+the timeouts for that path — the defaults (30s per attempt, three attempts on reads) are
+sized for a worker, not for someone watching a spinner:
 
 ```env
 CORREOS_TIMEOUT=8
 CORREOS_CONNECT_TIMEOUT=3
 ```
 
-**Serve the PDF from the action.** `decodedPdf()` gives you the bytes directly:
+</details>
+
+<details>
+<summary>Serve the PDF from the action</summary>
+
+`decodedPdf()` gives you the bytes directly:
 
 ```php
 Action::make('label')
@@ -495,11 +444,15 @@ answers without one:
 }
 ```
 
-**Selects and DTO properties.** `Enum::options()` feeds `Select::make(...)->options(...)`
-straight; note PHP turns numeric string values into integer keys, so cast back when
-hydrating a string-backed enum from form state (`ShipmentType::from((string) $state)`). And if
-you want to hold a DTO in a public component property, turn on spatie's Livewire
-synthesizers — they ship disabled:
+</details>
+
+<details>
+<summary>Selects and DTO properties</summary>
+
+`Enum::options()` feeds `Select::make(...)->options(...)` straight; note PHP turns numeric
+string values into integer keys, so cast back when hydrating a string-backed enum from form
+state (`ShipmentType::from((string) $state)`). And if you want to hold a DTO in a public
+component property, turn on spatie's Livewire synthesizers — they ship disabled:
 
 ```php
 // config/data.php
@@ -507,6 +460,8 @@ synthesizers — they ship disabled:
     'enable_synths' => true,
 ],
 ```
+
+</details>
 
 ## Testing
 
@@ -525,7 +480,8 @@ Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed re
 
 ## Contributing
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+Pull requests are welcome. Run `composer test`, `composer analyse` and `composer format`
+before opening one.
 
 ## Security Vulnerabilities
 
@@ -533,7 +489,7 @@ Please review [our security policy](../../security/policy) on how to report secu
 
 ## Credits
 
-- [SmartDato](https://github.com/smart-dato)
+- [arzcode](https://github.com/buzkall)
 - [All Contributors](../../contributors)
 
 ## License

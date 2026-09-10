@@ -1,7 +1,9 @@
 <?php
 
-namespace SmartDato\CorreosShipping\Connectors;
+namespace Arzcode\LaravelCorreos\Connectors;
 
+use Arzcode\LaravelCorreos\Auth\CorreosAuthenticator;
+use Arzcode\LaravelCorreos\Exceptions\CorreosApiException;
 use Composer\InstalledVersions;
 use Saloon\Contracts\Authenticator;
 use Saloon\Enums\Method;
@@ -10,13 +12,11 @@ use Saloon\Exceptions\Request\RequestException;
 use Saloon\Http\Connector;
 use Saloon\Http\Request;
 use Saloon\Http\Response;
-use SmartDato\CorreosShipping\Auth\CorreosAuthenticator;
-use SmartDato\CorreosShipping\Exceptions\CorreosApiException;
 use Throwable;
 
 abstract class CorreosConnector extends Connector
 {
-    protected const PACKAGE_NAME = 'smart-dato/correos-shipping-sdk';
+    protected const PACKAGE_NAME = 'arzcode/laravel-correos';
 
     protected const DEFAULT_TRIES = 3;
 
@@ -125,6 +125,6 @@ abstract class CorreosConnector extends Connector
             ? InstalledVersions::getPrettyVersion(self::PACKAGE_NAME)
             : null;
 
-        return 'SmartDato-CorreosShippingSDK'.($version !== null ? '/'.$version : '');
+        return 'Arzcode-LaravelCorreos'.($version !== null ? '/'.$version : '');
     }
 }

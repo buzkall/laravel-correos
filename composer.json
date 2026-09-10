@@ -1,17 +1,18 @@
 {
-    "name": "smart-dato/correos-shipping-sdk",
+    "name": "arzcode/laravel-correos",
     "description": "Laravel package for integrating Correos shipping, labels, customs documents, and tracking via Saloon.",
     "keywords": [
-        "SmartDato",
+        "arzcode",
         "laravel",
-        "correos-shipping-sdk"
+        "correos",
+        "shipping"
     ],
-    "homepage": "https://github.com/smart-dato/correos-shipping-sdk",
+    "homepage": "https://github.com/buzkall/laravel-correos",
     "license": "MIT",
     "authors": [
         {
-            "name": "SmartDato",
-            "email": "info@smart-dato.com",
+            "name": "arzcode",
+            "email": "git@arzcode.com",
             "role": "Developer"
         }
     ],
@@ -42,12 +43,12 @@
     },
     "autoload": {
         "psr-4": {
-            "SmartDato\\CorreosShipping\\": "src/"
+            "Arzcode\\LaravelCorreos\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "SmartDato\\CorreosShipping\\Tests\\": "tests/"
+            "Arzcode\\LaravelCorreos\\Tests\\": "tests/"
         }
     },
     "scripts": {
@@ -70,10 +71,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "SmartDato\\CorreosShipping\\CorreosShippingServiceProvider"
+                "Arzcode\\LaravelCorreos\\CorreosServiceProvider"
             ],
             "aliases": {
-                "CorreosShipping": "SmartDato\\CorreosShipping\\Facades\\CorreosShipping"
+                "Correos": "Arzcode\\LaravelCorreos\\Facades\\Correos"
             }
         }
     },

@@ -1,15 +1,15 @@
 <?php
 
+use Arzcode\LaravelCorreos\Auth\CorreosAuthenticator;
+use Arzcode\LaravelCorreos\Connectors\LabelsConnector;
+use Arzcode\LaravelCorreos\Data\Labels\LabelsResponseData;
+use Arzcode\LaravelCorreos\Data\Labels\PrintLabelsRequestData;
+use Arzcode\LaravelCorreos\Exceptions\CorreosApiException;
+use Arzcode\LaravelCorreos\Requests\Labels\PrintLabelsRequest;
+use Arzcode\LaravelCorreos\Resources\LabelsResource;
 use Illuminate\Support\Facades\Cache;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
-use SmartDato\CorreosShipping\Auth\CorreosAuthenticator;
-use SmartDato\CorreosShipping\Connectors\LabelsConnector;
-use SmartDato\CorreosShipping\Data\Labels\LabelsResponseData;
-use SmartDato\CorreosShipping\Data\Labels\PrintLabelsRequestData;
-use SmartDato\CorreosShipping\Exceptions\CorreosApiException;
-use SmartDato\CorreosShipping\Requests\Labels\PrintLabelsRequest;
-use SmartDato\CorreosShipping\Resources\LabelsResource;
 
 beforeEach(function (): void {
     Cache::put(
@@ -24,7 +24,7 @@ beforeEach(function (): void {
  */
 function errorException(array|string $body, int $status = 400): CorreosApiException
 {
-    config()->set('correos-shipping-sdk.base_urls.labels', 'https://api1.correos.es/support/labels/api/v1');
+    config()->set('laravel-correos.base_urls.labels', 'https://api1.correos.es/support/labels/api/v1');
 
     // Retries are disabled so the failed response is returned rather than
     // thrown: this helper is about how an error body maps onto the exception.
@@ -130,7 +130,7 @@ it('throws the api exception itself rather than a generic dto failure', function
         'fake-test-token',
         3600,
     );
-    config()->set('correos-shipping-sdk.base_urls.labels', 'https://api1.correos.es/support/labels/api/v1');
+    config()->set('laravel-correos.base_urls.labels', 'https://api1.correos.es/support/labels/api/v1');
 
     $connector = new LabelsConnector(
         new CorreosAuthenticator('id', 'secret', 'https://example.com/token', 'AP3', 'gw-id', 'gw-secret')
@@ -171,7 +171,7 @@ it('keeps the failed response reachable so the caller can log it', function (): 
         'fake-test-token',
         3600,
     );
-    config()->set('correos-shipping-sdk.base_urls.labels', 'https://api1.correos.es/support/labels/api/v1');
+    config()->set('laravel-correos.base_urls.labels', 'https://api1.correos.es/support/labels/api/v1');
 
     $connector = new LabelsConnector(
         new CorreosAuthenticator('id', 'secret', 'https://example.com/token', 'AP3', 'gw-id', 'gw-secret')

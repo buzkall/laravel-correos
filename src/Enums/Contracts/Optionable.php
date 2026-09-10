@@ -1,6 +1,6 @@
 <?php
 
-namespace SmartDato\CorreosShipping\Enums\Contracts;
+namespace Arzcode\LaravelCorreos\Enums\Contracts;
 
 use BackedEnum;
 

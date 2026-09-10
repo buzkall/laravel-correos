@@ -1,11 +1,11 @@
 <?php
 
-namespace SmartDato\CorreosShipping\Requests\Labels;
+namespace Arzcode\LaravelCorreos\Requests\Labels;
 
+use Arzcode\LaravelCorreos\Data\Labels\DocumentBackofficeResponseData;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 use Saloon\Http\Response;
-use SmartDato\CorreosShipping\Data\Labels\DocumentBackofficeResponseData;
 
 class GetDocumentBackofficeRequest extends Request
 {

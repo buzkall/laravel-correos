@@ -1,10 +1,10 @@
 <?php
 
-use SmartDato\CorreosShipping\Data\Preregister\AddresseeData;
-use SmartDato\CorreosShipping\Data\Preregister\DeliveryRequestData;
-use SmartDato\CorreosShipping\Data\Preregister\DeliveryResponseData;
-use SmartDato\CorreosShipping\Data\Preregister\SenderData;
-use SmartDato\CorreosShipping\Enums\ProductCode;
+use Arzcode\LaravelCorreos\Data\Preregister\AddresseeData;
+use Arzcode\LaravelCorreos\Data\Preregister\DeliveryRequestData;
+use Arzcode\LaravelCorreos\Data\Preregister\DeliveryResponseData;
+use Arzcode\LaravelCorreos\Data\Preregister\SenderData;
+use Arzcode\LaravelCorreos\Enums\ProductCode;
 
 it('creates delivery request data from array', function (): void {
     $data = DeliveryRequestData::from(fixtureJson('preregister/delivery_request.json'));

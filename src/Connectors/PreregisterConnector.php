@@ -1,11 +1,11 @@
 <?php
 
-namespace SmartDato\CorreosShipping\Connectors;
+namespace Arzcode\LaravelCorreos\Connectors;
 
 class PreregisterConnector extends CorreosConnector
 {
     public function resolveBaseUrl(): string
     {
-        return $this->baseUrl ?? config('correos-shipping-sdk.base_urls.preregister');
+        return $this->baseUrl ?? config('laravel-correos.base_urls.preregister');
     }
 }

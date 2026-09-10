@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to `correos-shipping-sdk` will be documented in this file.
+All notable changes to `laravel-correos` will be documented in this file.
 
 ## 0.0.4 - 2026-03-04
 

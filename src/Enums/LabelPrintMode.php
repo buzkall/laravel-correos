@@ -1,9 +1,9 @@
 <?php
 
-namespace SmartDato\CorreosShipping\Enums;
+namespace Arzcode\LaravelCorreos\Enums;
 
-use SmartDato\CorreosShipping\Enums\Concerns\HasOptions;
-use SmartDato\CorreosShipping\Enums\Contracts\Optionable;
+use Arzcode\LaravelCorreos\Enums\Concerns\HasOptions;
+use Arzcode\LaravelCorreos\Enums\Contracts\Optionable;
 
 enum LabelPrintMode: int implements Optionable
 {

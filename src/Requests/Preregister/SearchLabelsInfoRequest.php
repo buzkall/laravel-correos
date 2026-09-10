@@ -1,14 +1,14 @@
 <?php
 
-namespace SmartDato\CorreosShipping\Requests\Preregister;
+namespace Arzcode\LaravelCorreos\Requests\Preregister;
 
+use Arzcode\LaravelCorreos\Data\Preregister\LabelsInfoResponseData;
+use Arzcode\LaravelCorreos\Data\Preregister\SearchLabelsInfoRequestData;
 use Saloon\Contracts\Body\HasBody;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 use Saloon\Http\Response;
 use Saloon\Traits\Body\HasJsonBody;
-use SmartDato\CorreosShipping\Data\Preregister\LabelsInfoResponseData;
-use SmartDato\CorreosShipping\Data\Preregister\SearchLabelsInfoRequestData;
 
 class SearchLabelsInfoRequest extends Request implements HasBody
 {

@@ -1,14 +1,14 @@
 <?php
 
-namespace SmartDato\CorreosShipping\Requests\Preregister;
+namespace Arzcode\LaravelCorreos\Requests\Preregister;
 
+use Arzcode\LaravelCorreos\Data\Preregister\AnnulmentExpeditionRequestData;
+use Arzcode\LaravelCorreos\Data\Preregister\AnnulmentResponseData;
 use Saloon\Contracts\Body\HasBody;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 use Saloon\Http\Response;
 use Saloon\Traits\Body\HasJsonBody;
-use SmartDato\CorreosShipping\Data\Preregister\AnnulmentExpeditionRequestData;
-use SmartDato\CorreosShipping\Data\Preregister\AnnulmentResponseData;
 
 class CancelExpeditionRequest extends Request implements HasBody
 {

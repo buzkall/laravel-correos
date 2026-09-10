@@ -1,11 +1,11 @@
 <?php
 
-namespace SmartDato\CorreosShipping\Requests\Tracking;
+namespace Arzcode\LaravelCorreos\Requests\Tracking;
 
+use Arzcode\LaravelCorreos\Data\Tracking\ExpeditionResponseData;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 use Saloon\Http\Response;
-use SmartDato\CorreosShipping\Data\Tracking\ExpeditionResponseData;
 
 class GetExpeditionRequest extends Request
 {
