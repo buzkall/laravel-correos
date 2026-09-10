@@ -66,7 +66,7 @@ abstract class CorreosConnector extends Connector
         return [
             'Accept' => 'application/json',
             'Content-Type' => 'application/json',
-            'User-Agent' => $this->userAgent ?? self::defaultUserAgent(),
+            'User-Agent' => $this->userAgent ?? static::defaultUserAgent(),
         ];
     }
 
@@ -130,8 +130,8 @@ abstract class CorreosConnector extends Connector
      */
     protected static function defaultUserAgent(): string
     {
-        $version = InstalledVersions::isInstalled(self::PACKAGE_NAME)
-            ? InstalledVersions::getPrettyVersion(self::PACKAGE_NAME)
+        $version = InstalledVersions::isInstalled(static::PACKAGE_NAME)
+            ? InstalledVersions::getPrettyVersion(static::PACKAGE_NAME)
             : null;
 
         return 'Arzcode-LaravelCorreos'.($version !== null ? '/'.$version : '');
