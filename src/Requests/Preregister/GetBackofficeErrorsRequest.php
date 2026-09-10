@@ -25,12 +25,14 @@ class GetBackofficeErrorsRequest extends Request
 
     protected function defaultQuery(): array
     {
+        // Only unset parameters are dropped: a bare array_filter() would also
+        // throw away a legitimate '0'.
         return array_filter([
             'contractNumber' => $this->contractNumber,
             'clientNumber' => $this->clientNumber,
             'dateFrom' => $this->dateFrom,
             'dateTo' => $this->dateTo,
-        ]);
+        ], fn (?string $value): bool => $value !== null);
     }
 
     public function createDtoFromResponse(Response $response): BackofficeResponseData

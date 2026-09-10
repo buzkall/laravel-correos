@@ -24,11 +24,13 @@ class GetPackagesByReferenceRequest extends Request
 
     protected function defaultQuery(): array
     {
+        // Only unset parameters are dropped: a bare array_filter() would also
+        // throw away a legitimate '0'.
         return array_filter([
             'clientReference' => $this->clientReference,
             'contractNumber' => $this->contractNumber,
             'clientNumber' => $this->clientNumber,
-        ]);
+        ], fn (?string $value): bool => $value !== null);
     }
 
     public function createDtoFromResponse(Response $response): PackageReferenceResponseData
