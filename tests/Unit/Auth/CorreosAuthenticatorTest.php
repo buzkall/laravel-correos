@@ -133,3 +133,20 @@ it('does not cache a token that is about to expire', function (): void {
     expect($authenticator->exposedGetToken())->toBe($token)
         ->and(Cache::get($authenticator->cacheKey()))->toBeNull();
 });
+
+it('fails clearly when the token endpoint answers without a token', function (): void {
+    Http::fake(['https://example.com/token' => Http::response(['message' => 'Service Unavailable'])]);
+
+    expect(fn (): string => testableAuthenticator()->exposedGetToken())
+        ->toThrow(RuntimeException::class, 'The Correos token endpoint answered without an idToken.');
+});
+
+it('forgets the cached token on request', function (): void {
+    $authenticator = testableAuthenticator();
+
+    Cache::put($authenticator->cacheKey(), 'fake-test-token', 3600);
+
+    $authenticator->forgetToken();
+
+    expect(Cache::get($authenticator->cacheKey()))->toBeNull();
+});

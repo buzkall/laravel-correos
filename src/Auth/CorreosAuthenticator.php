@@ -4,6 +4,7 @@ namespace Arzcode\LaravelCorreos\Auth;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use RuntimeException;
 use Saloon\Contracts\Authenticator;
 use Saloon\Http\PendingRequest;
 
@@ -88,7 +89,16 @@ class CorreosAuthenticator implements Authenticator
 
         $response->throw();
 
-        return $response->json('idToken');
+        $token = $response->json('idToken');
+
+        // A gateway that answers 200 with something other than a token — an
+        // HTML error page, a renamed field — would otherwise surface as a
+        // TypeError from this method's return type.
+        if (! is_string($token) || $token === '') {
+            throw new RuntimeException('The Correos token endpoint answered without an idToken.');
+        }
+
+        return $token;
     }
 
     /**
