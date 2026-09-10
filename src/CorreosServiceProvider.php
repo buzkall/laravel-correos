@@ -55,7 +55,10 @@ class CorreosServiceProvider extends PackageServiceProvider
             ));
         }
 
-        $this->app->singleton(Correos::class, fn ($app): Correos => new Correos(
+        // Scoped, not a singleton: the resources hang on to the last response so
+        // callers can log it, and under Octane or a long-running queue worker a
+        // singleton would carry one request's response into the next.
+        $this->app->scoped(Correos::class, fn ($app): Correos => new Correos(
             $app->make(PreregisterConnector::class),
             $app->make(LabelsConnector::class),
             $app->make(TrackingConnector::class),
