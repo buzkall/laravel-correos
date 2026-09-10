@@ -3,6 +3,7 @@
 namespace Arzcode\LaravelCorreos;
 
 use Arzcode\LaravelCorreos\Auth\CorreosAuthenticator;
+use Arzcode\LaravelCorreos\Connectors\CorreosConnector;
 use Arzcode\LaravelCorreos\Connectors\LabelsConnector;
 use Arzcode\LaravelCorreos\Connectors\PreregisterConnector;
 use Arzcode\LaravelCorreos\Connectors\TrackingConnector;
@@ -40,41 +41,19 @@ class CorreosServiceProvider extends PackageServiceProvider
             forceIpResolve: config('laravel-correos.force_ip_resolve'),
         ));
 
-        $this->app->singleton(PreregisterConnector::class, fn ($app): PreregisterConnector => new PreregisterConnector(
-            $app->make(CorreosAuthenticator::class),
-            verifySsl: (bool) config('laravel-correos.verify_ssl', true),
-            forceIpResolve: config('laravel-correos.force_ip_resolve'),
-            tries: (int) config('laravel-correos.retry.times', 3),
-            retryInterval: (int) config('laravel-correos.retry.interval', 500),
-            useExponentialBackoff: (bool) config('laravel-correos.retry.exponential_backoff', true),
-            userAgent: config('laravel-correos.user_agent'),
-            timeout: $this->optionalInt(config('laravel-correos.timeout')),
-            connectTimeout: $this->optionalInt(config('laravel-correos.connect_timeout')),
-        ));
-
-        $this->app->singleton(LabelsConnector::class, fn ($app): LabelsConnector => new LabelsConnector(
-            $app->make(CorreosAuthenticator::class),
-            verifySsl: (bool) config('laravel-correos.verify_ssl', true),
-            forceIpResolve: config('laravel-correos.force_ip_resolve'),
-            tries: (int) config('laravel-correos.retry.times', 3),
-            retryInterval: (int) config('laravel-correos.retry.interval', 500),
-            useExponentialBackoff: (bool) config('laravel-correos.retry.exponential_backoff', true),
-            userAgent: config('laravel-correos.user_agent'),
-            timeout: $this->optionalInt(config('laravel-correos.timeout')),
-            connectTimeout: $this->optionalInt(config('laravel-correos.connect_timeout')),
-        ));
-
-        $this->app->singleton(TrackingConnector::class, fn ($app): TrackingConnector => new TrackingConnector(
-            $app->make(CorreosAuthenticator::class),
-            verifySsl: (bool) config('laravel-correos.verify_ssl', true),
-            forceIpResolve: config('laravel-correos.force_ip_resolve'),
-            tries: (int) config('laravel-correos.retry.times', 3),
-            retryInterval: (int) config('laravel-correos.retry.interval', 500),
-            useExponentialBackoff: (bool) config('laravel-correos.retry.exponential_backoff', true),
-            userAgent: config('laravel-correos.user_agent'),
-            timeout: $this->optionalInt(config('laravel-correos.timeout')),
-            connectTimeout: $this->optionalInt(config('laravel-correos.connect_timeout')),
-        ));
+        foreach ([PreregisterConnector::class, LabelsConnector::class, TrackingConnector::class] as $connector) {
+            $this->app->singleton($connector, fn ($app): CorreosConnector => new $connector(
+                $app->make(CorreosAuthenticator::class),
+                verifySsl: (bool) config('laravel-correos.verify_ssl', true),
+                forceIpResolve: config('laravel-correos.force_ip_resolve'),
+                tries: (int) config('laravel-correos.retry.times', 3),
+                retryInterval: (int) config('laravel-correos.retry.interval', 500),
+                useExponentialBackoff: (bool) config('laravel-correos.retry.exponential_backoff', true),
+                userAgent: config('laravel-correos.user_agent'),
+                timeout: $this->optionalInt(config('laravel-correos.timeout')),
+                connectTimeout: $this->optionalInt(config('laravel-correos.connect_timeout')),
+            ));
+        }
 
         $this->app->singleton(Correos::class, fn ($app): Correos => new Correos(
             $app->make(PreregisterConnector::class),
