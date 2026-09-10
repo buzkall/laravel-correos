@@ -17,7 +17,7 @@ class GetDocumentBackofficeRequest extends Request
 
     public function resolveEndpoint(): string
     {
-        return '/documents/backoffice/'.$this->shipment;
+        return '/documents/backoffice/'.rawurlencode($this->shipment);
     }
 
     public function createDtoFromResponse(Response $response): DocumentBackofficeResponseData

@@ -17,7 +17,7 @@ class SearchShipmentRequest extends Request
 
     public function resolveEndpoint(): string
     {
-        return '/search/'.$this->shippingCode;
+        return '/search/'.rawurlencode($this->shippingCode);
     }
 
     public function createDtoFromResponse(Response $response): ShipmentSearchResponseData

@@ -17,7 +17,7 @@ class GetBackofficeShipmentRequest extends Request
 
     public function resolveEndpoint(): string
     {
-        return '/delivery/package/backoffice/shipment/'.$this->shipmentCode;
+        return '/delivery/package/backoffice/shipment/'.rawurlencode($this->shipmentCode);
     }
 
     public function createDtoFromResponse(Response $response): BackofficeResponseData

@@ -17,7 +17,7 @@ class GetExpeditionRequest extends Request
 
     public function resolveEndpoint(): string
     {
-        return '/expedition/'.$this->expeditionCode;
+        return '/expedition/'.rawurlencode($this->expeditionCode);
     }
 
     public function createDtoFromResponse(Response $response): ExpeditionResponseData
