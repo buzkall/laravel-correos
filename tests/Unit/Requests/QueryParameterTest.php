@@ -13,5 +13,5 @@ it('drops unset query parameters but keeps a zero', function (): void {
 });
 
 it('sends no query parameters when none are given', function (): void {
-    expect(new GetBackofficeErrorsRequest()->query()->all())->toBe([]);
+    expect(new GetBackofficeErrorsRequest()->query()->all())->toBeEmpty();
 });
